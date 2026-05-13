@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="theme-color" content="#F03228">
+  <title>U Festival · Officiële Gids</title>
+  <!-- Google Fonts: Sansation -->
+  <link href="https://fonts.googleapis.com/css2?family=Sansation:wght@300;400;700&display=swap" rel="stylesheet">
+  <!-- Leaflet CSS + JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+    }
+
+    /* Kleuren & typografie */
+    :root {
+      --accent: #F03228;
+      --secondary: #247BA0;
+      --info-saffron: #E3B505;
+      --bg-light: #FFFFFF;
+      --text-light: #000000;
+      --bg-dark: #121212;
+      --text-dark: #F5F5F5;
+      --card-light: #F9F9F9;
+      --card-dark: #1E1E1E;
+      --border-light: #E0E0E0;
+      --border-dark: #2C2C2C;
+    }
+
+    body {
+      font-family: 'Sansation', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      padding-bottom: 70px;
+    }
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* Koppen: Bold 700, secundair blauw */
+    h1, h2, h3, .section-title {
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    body.dark h1, body.dark h2, body.dark h3, body.dark .section-title {
+      color: #5bb4d4;
+    }
+    /* Normale tekst: Regular 400 */
+    p, li, .info-text, .card, .schedule-grid td, .comment {
+      font-weight: 400;
+    }
+    /* Knoppen & interactief: Light 300 Italic */
+    button, .tool-btn, .nav-item, .post-btn {
+      font-weight: 300;
+      font-style: italic;
+    }
+    button, .tool-btn {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    button:hover, .tool-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Header: Zwart (altijd) */
+    .app-header {
+      position: sticky;
+      top: 0;
+      background: #000000 !important;
+      z-index: 20;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo h1 {
+      color: white !important;
+      font-size: 1.6rem;
+    }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Bottom navigatie: ROOD (#F03228) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #F03228 !important;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 16px;
+      z-index: 20;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      color: white !important;
+      font-size: 0.7rem;
+      border: none;
+      cursor: pointer;
+    }
+    .nav-item i, .nav-item span {
+      color: white !important;
+    }
+    .nav-item.active {
+      color: #FFE5B4 !important;
+    }
+    .nav-item.active i, .nav-item.active span {
+      color: #FFE5B4 !important;
+    }
+
+    /* Pagina's */
+    .page {
+      display: none;
+      padding: 20px 16px;
+      animation: fade 0.2s;
+    }
+    .active-page {
+      display: block;
+    }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    /* Kaarten */
+    .card {
+      background: var(--card-light);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    body.dark .card {
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+    }
+    .section-title {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+    .info-saffron-badge {
+      background: var(--info-saffron);
+      color: #000;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    /* Line-up lijst */
+    .artist-list-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-light);
+      padding: 14px 0;
+    }
+    .stage-badge {
+      background: var(--secondary);
+      padding: 2px 8px;
+      border-radius: 20px;
+      color: white;
+      font-size: 0.7rem;
+    }
+
+    /* Schema tabel */
+    .schedule-container {
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+    .schedule-grid {
+      min-width: 500px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .schedule-grid th, .schedule-grid td {
+      border: 1px solid var(--border-light);
+      padding: 12px 8px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    /* Kaart */
+    #map {
+      height: 55vh;
+      border-radius: 28px;
+      margin-bottom: 8px;
+    }
+
+    /* Modal voor interactie met locaties */
+    .modal {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-light);
+      border-radius: 28px 28px 0 0;
+      padding: 20px;
+      z-index: 1000;
+      transform: translateY(100%);
+      transition: transform 0.25s;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    body.dark .modal {
+      background: var(--card-dark);
+    }
+    .modal.open {
+      transform: translateY(0);
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 999;
+      display: none;
+    }
+    .modal-overlay.open {
+      display: block;
+    }
+    .comment-list {
+      margin: 16px 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .comment {
+      background: var(--bg-light);
+      padding: 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    body.dark .comment {
+      background: #2a2a2a;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 40px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-light);
+      font-family: 'Sansation', sans-serif;
+      margin-top: 8px;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo"><h1>U FESTIVAL</h1></div>
+  <div class="toolbar">
+    <button class="tool-btn" id="langSwitchBtn"><i class="fas fa-globe"></i> <span id="langLabel">EN</span></button>
+    <button class="tool-btn" id="themeSwitchBtn"><i class="fas fa-moon"></i></button>
+  </div>
+</div>
+
+<main>
+  <!-- PAGINA 1: HOME -->
+  <div id="homePage" class="page active-page">
+    <div class="card">
+      <span class="info-saffron-badge"><i class="fas fa-calendar-alt"></i> 12-13 JULY</span>
+      <h2 class="section-title" data-i18n="welcome_title">WELCOME TO U FESTIVAL</h2>
+      <p data-i18n="home_desc">Two days of music, art, and community in the heart of Utrecht. Free bike parking, food trucks, and 3 magical stages.</p>
+      <div style="margin-top: 16px;"><i class="fas fa-map-marker-alt"></i> <span data-i18n="location_txt">Utrecht, Papendorp</span></div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="access_short">🚲 Accessibility</h3>
+      <p data-i18n="bike_info">🚲 Free guarded bicycle parking (large capacity).</p>
+      <p data-i18n="car_info">🚗 P+R Papendorp – buy parking ticket online or PIN only at entrance. Follow signs 'P online ticket'.</p>
+      <p><i class="fas fa-train"></i> <span data-i18n="train_info">Train station Utrecht Leidsche Rijn + shuttle bus.</span></p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="contact_title">📞 Contact & Info</h3>
+      <p>📧 hello@ufestival.nl &nbsp;|&nbsp; 📞 +31 30 123 4567</p>
+      <p>📍 First aid & info points near main entrance.</p>
+    </div>
+  </div>
+
+  <!-- PAGINA 2: INFO (bereikbaarheid, FAQ) -->
+  <div id="infoPage" class="page">
+    <div class="card">
+      <h2 class="section-title" data-i18n="info_page_title">Festival info</h2>
+      <p data-i18n="info_text">U Festival is a sustainable, inclusive event. Lockers, water stations, and accessible toilets available. Emergency number +31 30 123 4567.</p>
+      <hr style="margin: 16px 0; border-color: var(--border-light);">
+      <h3 data-i18n="bereikbaarheid">🚲 Bereikbaarheid / Accessibility</h3>
+      <p><strong data-i18n="bike_title">🚲 Fiets</strong><br><span data-i18n="bike_desc">Gratis bewaakte fietsenstalling aan de noordzijde van het terrein.</span></p>
+      <p><strong data-i18n="car_title">🚗 Auto</strong><br><span data-i18n="car_desc">Parkeertickets voor P+R Papendorp (online of PIN). Volg borden 'P online ticket'. Let op: geen contant.</span></p>
+      <p><strong data-i18n="shuttle">🚌 Shuttle</strong><br><span data-i18n="shuttle_desc">Gratis pendelbus vanaf station Utrecht Centraal (elke 15 min).</span></p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="faq_title">❓ FAQ</h3>
+      <p><strong data-i18n="q_drink">Mag ik eigen drank meenemen?</strong><br><span data-i18n="a_drink">Alleen lege bidons (max 0.5L) – gratis waterpunten.</span></p>
+      <p><strong data-i18n="q_pets">Honden toegestaan?</strong><br><span data-i18n="a_pets">Alleen assistentiehonden.</span></p>
+      <p><strong data-i18n="q_lockers">Kluisjes?</strong><br><span data-i18n="a_lockers">Aanwezig bij entree (€5 per dag).</span></p>
+    </div>
+  </div>
+
+  <!-- PAGINA 3: PROGRAMMA (line-up + blokschema in één pagina, zonder sub-tabs) -->
+  <div id="programPage" class="page">
+    <div class="card">
+      <h2 class="section-title">🎵 LINE-UP</h2>
+      <div id="artistsContainer"></div>
+    </div>
+    <div class="card">
+      <h2 class="section-title">📅 BLOKSCHEMA</h2>
+      <div class="schedule-container" id="scheduleGridContainer"></div>
+    </div>
+  </div>
+
+  <!-- PAGINA 4: KAART (interactief met GPS) -->
+  <div id="mapPage" class="page">
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div id="map" style="height: 55vh; width: 100%;"></div>
+    </div>
+    <p class="info-text" style="font-size: 0.75rem; margin-top: 8px; text-align:center;"><i class="fas fa-location-dot"></i> <span data-i18n="map_hint">Tap markers to interact & leave messages for other visitors!</span></p>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-item" data-nav="home"><i class="fas fa-home"></i><span data-i18n="nav_home">Home</span></button>
+  <button class="nav-item" data-nav="info"><i class="fas fa-info-circle"></i><span data-i18n="nav_info">Info</span></button>
+  <button class="nav-item" data-nav="program"><i class="fas fa-music"></i><span data-i18n="nav_program">Programma</span></button>
+  <button class="nav-item" data-nav="map"><i class="fas fa-map"></i><span data-i18n="nav_map">Kaart</span></button>
+</nav>
+
+<!-- Modal voor locatie-interactie (extra feature) -->
+<div id="modalOverlay" class="modal-overlay"></div>
+<div id="locationModal" class="modal">
+  <div class="flex-between"><h3 id="modalLocationTitle"></h3><button id="closeModalBtn" style="background: transparent; font-size: 1.8rem; color: var(--accent);">&times;</button></div>
+  <p id="modalLocationDesc" style="margin-bottom: 8px;"></p>
+  <div class="comment-list" id="commentList"></div>
+  <textarea id="commentInput" rows="2" placeholder="Say something to other festival-goers..."></textarea>
+  <button id="postCommentBtn" style="margin-top: 8px; width: 100%;"><i class="fas fa-paper-plane"></i> Post message</button>
+</div>
+
+<script>
+  // ---------- DATA (makkelijk uit te breiden) ----------
+  const artistsData = [
+    { name: "Spinvis", genre: "Lo-fi / Indie", desc_nl: "Eenmansband van Erik de Jong. Lo-fi vol verhalen, fluitjes en tandbelte.", desc_en: "One-man band by Erik de Jong. Lo-fi stories, whistles and magic.", day: "Zaterdag" },
+    { name: "Stand-up Collective", genre: "Comedy", desc_nl: "Hilarische comedians met scherpe grappen.", desc_en: "Hilarious stand-up comedians.", day: "Zaterdag" },
+    { name: "DJ set 1", genre: "Electronic", desc_nl: "Energizing DJ set met house & techno.", desc_en: "Energizing DJ set with house & techno.", day: "Zondag" },
+    { name: "The Luminals", genre: "Indie Rock", desc_nl: "Indie rock met aanstekelijke melodieën.", desc_en: "Indie rock with catchy melodies.", day: "Zondag" },
+    { name: "Bass Horizon", genre: "Bass Music", desc_nl: "Dubstep & future bass.", desc_en: "Dubstep & future bass.", day: "Zaterdag" }
+  ];
+
+  const scheduleSlots = [
+    { day: "Zaterdag", time: "10:00 - 11:00", stage: "Main Stage", artist: "Spinvis" },
+    { day: "Zaterdag", time: "11:00 - 12:00", stage: "Comedy Tent", artist: "Stand-up Collective" },
+    { day: "Zaterdag", time: "13:00 - 14:30", stage: "Bass Stage", artist: "Bass Horizon" },
+    { day: "Zondag", time: "10:00 - 11:30", stage: "Main Stage", artist: "DJ set 1" },
+    { day: "Zondag", time: "12:00 - 13:30", stage: "Garden Stage", artist: "The Luminals" }
+  ];
+
+  const locationsData = [
+    { id: "mainStage", name_en: "🎸 Main Stage", name_nl: "🎸 Hoofdpodium", lat: 52.0919, lng: 5.1215, desc_en: "Biggest stage - headliners & magic moments", desc_nl: "Grootste podium - headliners & magie" },
+    { id: "comedyTent", name_en: "🎭 Comedy Tent", name_nl: "🎭 Comedy Tent", lat: 52.0905, lng: 5.1228, desc_en: "Stand-up, laughs & improv", desc_nl: "Stand-up, lachsalvo's & improvisatie" },
+    { id: "foodPlaza", name_en: "🍔 Food Plaza", name_nl: "🍔 Foodplein", lat: 52.0920, lng: 5.1200, desc_en: "Vegan, pizza, and local bites", desc_nl: "Vega, pizza en lokale lekkernijen" },
+    { id: "infoPoint", name_en: "ℹ️ Info Point", name_nl: "ℹ️ Infopunt", lat: 52.0910, lng: 5.1192, desc_en: "Lockers, first aid & lost & found", desc_nl: "Kluisjes, EHBO & gevonden voorwerpen" }
+  ];
+
+  let commentsDB = {};
+  let currentLang = 'en';
+  let mapInstance = null, userMarker = null, mapMarkers = [];
+  let activeLocationId = null;
+
+  // Vertalingen
+  const translations = {
+    en: {
+      welcome_title: "WELCOME TO U FESTIVAL", home_desc: "Two days of music, art, and community.", location_txt: "Utrecht Papendorp",
+      bike_info: "🚲 Free guarded bicycle parking.", car_info: "🚗 P+R Papendorp – online ticket or PIN at entrance.", train_info: "Shuttle bus from Central Station.",
+      contact_title: "Contact & Info", info_page_title: "Practical Info", info_text: "Sustainable festival, lockers, water points.",
+      bereikbaarheid: "Accessibility", bike_title: "🚲 Bicycle", bike_desc: "Free guarded bike parking at north side.",
+      car_title: "🚗 Car", car_desc: "Parking tickets for P+R Papendorp (online or PIN). Follow signs. No cash.",
+      shuttle: "🚌 Shuttle", shuttle_desc: "Free shuttle from Utrecht Centraal every 15 min.",
+      faq_title: "FAQ", q_drink: "Can I bring my own drinks?", a_drink: "Only empty 0.5L bottles, free water points.",
+      q_pets: "Pets allowed?", a_pets: "Only service dogs.", q_lockers: "Lockers?", a_lockers: "Yes, €5/day near entrance.",
+      nav_home: "Home", nav_info: "Info", nav_program: "Program", nav_map: "Map",
+      map_hint: "Tap markers to interact & leave messages for other visitors!"
+    },
+    nl: {
+      welcome_title: "WELKOM OP U FESTIVAL", home_desc: "Twee dagen muziek, kunst & community.", location_txt: "Utrecht Papendorp",
+      bike_info: "🚲 Gratis bewaakte fietsenstalling.", car_info: "🚗 P+R Papendorp – ticket online of PIN bij ingang. Volg borden.", train_info: "Shuttlebus vanaf Centraal Station.",
+      contact_title: "Contact & Info", info_page_title: "Praktische info", info_text: "Duurzaam festival, kluisjes, waterpunten.",
+      bereikbaarheid: "Bereikbaarheid", bike_title: "🚲 Fiets", bike_desc: "Gratis bewaakte stalling aan noordzijde.",
+      car_title: "🚗 Auto", car_desc: "Parkeertickets P+R Papendorp (online of PIN). Let op: geen contant.",
+      shuttle: "🚌 Pendelbus", shuttle_desc: "Gratis pendel vanaf Utrecht Centraal elke 15 min.",
+      faq_title: "FAQ", q_drink: "Mag ik eigen drank meenemen?", a_drink: "Alleen lege flesjes 0,5L, waterpunten beschikbaar.",
+      q_pets: "Honden toegestaan?", a_pets: "Alleen assistentiehonden.", q_lockers: "Kluisjes?", a_lockers: "Ja, €5/dag bij ingang.",
+      nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart",
+      map_hint: "Tik op markers om te reageren en berichten achter te laten!"
+    }
+  };
+
+  function applyLanguage() {
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if(translations[currentLang][key]) el.innerText = translations[currentLang][key];
+    });
+    document.getElementById("langLabel").innerText = currentLang.toUpperCase();
+    renderLineupAndSchedule();
+    if(mapInstance) updateMapPopups();
+    if(activeLocationId) renderCommentsForLocation(activeLocationId);
+  }
+
+  function renderLineupAndSchedule() {
+    // Line-up
+    const container = document.getElementById("artistsContainer");
+    container.innerHTML = "";
+    artistsData.forEach(art => {
+      const desc = currentLang === 'en' ? art.desc_en : art.desc_nl;
+      container.innerHTML += `
+        <div class="artist-list-item">
+          <div><strong>${art.name}</strong> <span class="stage-badge">${art.genre}</span><br><small>${art.day}</small></div>
+          <div style="max-width: 60%; text-align:right;"><i>${desc}</i></div>
+        </div>
+      `;
+    });
+    // Extra Spinvis toelichting
+    container.innerHTML += `<div style="margin-top:12px; padding:12px; background: var(--info-saffron); border-radius: 20px; color:#000;"><strong>✨ Spinvis ✨</strong><br>${currentLang === 'en' ? 'Spinvis is the one-man band of Erik de Jong. Lo-fi debut built on computers, whistles, and magic.' : 'Spinvis is de eenmansband van Erik de Jong. Het Lo-Fi-debuut geknutseld op zolder met fluitjes en tandbelte.'}</div>`;
+
+    // Blokschema
+    const scheduleDiv = document.getElementById("scheduleGridContainer");
+    const satRows = scheduleSlots.filter(s => s.day === "Zaterdag");
+    const sunRows = scheduleSlots.filter(s => s.day === "Zondag");
+    function buildTable(rows, dayName) {
+      if(rows.length === 0) return `<h4>${dayName}</h4><p>Geen acts</p>`;
+      let html = `<h4 style="margin: 20px 0 10px;">${dayName}</h4><table class="schedule-grid"><thead><tr><th>Tijd</th><th>Podium</th><th>Artiest</th></tr></thead><tbody>`;
+      rows.forEach(slot => {
+        html += `<tr><td>${slot.time}</td><td>${slot.stage}</td><td><strong>${slot.artist}</strong></td></tr>`;
+      });
+      html += `</tbody></table>`;
+      return html;
+    }
+    scheduleDiv.innerHTML = buildTable(satRows, "Zaterdag / Saturday") + buildTable(sunRows, "Zondag / Sunday");
+  }
+
+  // ---------- KAART & INTERACTIE ----------
+  function initMap() {
+    if(mapInstance) mapInstance.remove();
+    mapInstance = L.map('map').setView([52.0915, 5.1210], 16);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+      subdomains: 'abcd'
+    }).addTo(mapInstance);
+    mapInstance.locate({ setView: true, watch: true, enableHighAccuracy: true });
+    mapInstance.on('locationfound', (e) => {
+      if(userMarker) mapInstance.removeLayer(userMarker);
+      userMarker = L.marker(e.latlng, { 
+        icon: L.divIcon({ html: '<div style="background:#F03228; width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 0 6px black;"></div>', iconSize: [14,14] })
+      }).addTo(mapInstance).bindPopup(currentLang === 'en' ? "📍 You are here" : "📍 Jij bent hier").openPopup();
+    });
+    addLocationMarkers();
+  }
+
+  function addLocationMarkers() {
+    if(mapMarkers.length) mapMarkers.forEach(m => mapInstance.removeLayer(m));
+    mapMarkers = [];
+    locationsData.forEach(loc => {
+      const marker = L.marker([loc.lat, loc.lng]).addTo(mapInstance);
+      marker.bindPopup(getPopupText(loc));
+      marker.on('click', () => openLocationModal(loc));
+      mapMarkers.push(marker);
+    });
+  }
+
+  function getPopupText(loc) {
+    const name = currentLang === 'en' ? loc.name_en : loc.name_nl;
+    return `<strong>${name}</strong><br><em>${currentLang === 'en' ? 'Tap to interact' : 'Tik voor interactie'}</em>`;
+  }
+
+  function updateMapPopups() {
+    mapMarkers.forEach((marker, idx) => {
+      const loc = locationsData[idx];
+      marker.bindPopup(getPopupText(loc));
+    });
+  }
+
+  function openLocationModal(loc) {
+    activeLocationId = loc.id;
+    const modal = document.getElementById('locationModal');
+    const overlay = document.getElementById('modalOverlay');
+    document.getElementById('modalLocationTitle').innerText = (currentLang === 'en' ? loc.name_en : loc.name_nl);
+    document.getElementById('modalLocationDesc').innerText = (currentLang === 'en' ? loc.desc_en : loc.desc_nl);
+    renderCommentsForLocation(loc.id);
+    modal.classList.add('open');
+    overlay.classList.add('open');
+  }
+
+  function renderCommentsForLocation(locId) {
+    const container = document.getElementById('commentList');
+    const comments = commentsDB[locId] || [];
+    if(comments.length === 0) { container.innerHTML = '<p><i>✨ No messages yet. Be the first!</i></p>'; return; }
+    container.innerHTML = comments.slice().reverse().map(c => `<div class="comment"><strong>🧑‍🎤 ${escapeHtml(c.user)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+  }
+
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  function postCommentToLocation() {
+    if(!activeLocationId) return;
+    const input = document.getElementById('commentInput');
+    const text = input.value.trim();
+    if(text === "") return;
+    const username = "Visitor" + Math.floor(Math.random() * 1000);
+    const newComment = { user: username, text: text, timestamp: Date.now() };
+    if(!commentsDB[activeLocationId]) commentsDB[activeLocationId] = [];
+    commentsDB[activeLocationId].push(newComment);
+    saveCommentsToStorage();
+    renderCommentsForLocation(activeLocationId);
+    input.value = "";
+  }
+
+  function saveCommentsToStorage() { localStorage.setItem('ufest_comments_v2', JSON.stringify(commentsDB)); }
+  function loadComments() {
+    const stored = localStorage.getItem('ufest_comments_v2');
+    if(stored) commentsDB = JSON.parse(stored);
+    else {
+      commentsDB = {
+        mainStage: [{ user: "Daan", text: "Insane vibe tonight! 🔥", timestamp: Date.now() }],
+        comedyTent: [{ user: "Sarah", text: "Great laughs!", timestamp: Date.now() }],
+        foodPlaza: [{ user: "Alex", text: "Try the vegan burger!", timestamp: Date.now() }],
+        infoPoint: [{ user: "FestivalTeam", text: "We're here to help 💙", timestamp: Date.now() }]
+      };
+    }
+  }
+
+  // ---------- PWA (installeerbaar via QR) ----------
+  function registerServiceWorker() {
+    if('serviceWorker' in navigator) {
+      const swCode = `self.addEventListener('fetch', e => e.respondWith(fetch(e.request))); self.addEventListener('install', e => self.skipWaiting());`;
+      const blob = new Blob([swCode], {type: 'application/javascript'});
+      const url = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(url).catch(err => console.log("SW not critical", err));
+    }
+    const manifest = {
+      name: "U Festival Guide",
+      short_name: "UFest",
+      start_url: ".",
+      display: "standalone",
+      theme_color: "#F03228",
+      background_color: "#000000",
+      icons: [{ src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23F03228' width='100' height='100'/%3E%3Ctext x='50' y='67' text-anchor='middle' fill='white' font-size='50' font-family='sans'%3EU%3C/text%3E%3C/svg%3E", sizes: "any" }]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = manifestURL;
+    document.head.appendChild(link);
+  }
+
+  // ---------- THEMA (light/dark) ----------
+  function initTheme() {
+    const saved = localStorage.getItem('ufest_theme');
+    if(saved === 'dark') document.body.classList.add('dark');
+    else if(saved === 'light') document.body.classList.remove('dark');
+    else if(window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.classList.add('dark');
+    document.getElementById('themeSwitchBtn').addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('ufest_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    });
+  }
+
+  // ---------- NAVIGATIE (4 eigen pagina's) ----------
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+    document.getElementById(`${pageId}Page`).classList.add('active-page');
+    document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+    const activeNav = document.querySelector(`.nav-item[data-nav="${pageId}"]`);
+    if(activeNav) activeNav.classList.add('active');
+    if(pageId === 'map' && mapInstance) setTimeout(() => mapInstance.invalidateSize(), 150);
+  }
+
+  function setupNavigation() {
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const navId = btn.getAttribute('data-nav');
+        showPage(navId);
+      });
+    });
+  }
+
+  // ---------- INIT ----------
+  window.addEventListener('DOMContentLoaded', () => {
+    loadComments();
+    initTheme();
+    setupNavigation();
+    renderLineupAndSchedule();
+    initMap();
+    registerServiceWorker();
+
+    document.getElementById('langSwitchBtn').addEventListener('click', () => {
+      currentLang = currentLang === 'en' ? 'nl' : 'en';
+      applyLanguage();
+      updateMapPopups();
+      if(activeLocationId) renderCommentsForLocation(activeLocationId);
+    });
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      document.getElementById('locationModal').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+      activeLocationId = null;
+    });
+    document.getElementById('modalOverlay').addEventListener('click', () => {
+      document.getElementById('locationModal').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+    });
+    document.getElementById('postCommentBtn').addEventListener('click', postCommentToLocation);
+    applyLanguage();
+    showPage('home');
+  });
+</script>
+</body>
+</html>
