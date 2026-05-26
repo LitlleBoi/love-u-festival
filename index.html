@@ -7,9 +7,6 @@
   <title>❤️U Festival · Blokkenschema</title>
   <!-- Google Fonts: Sansation -->
   <link href="https://fonts.googleapis.com/css2?family=Sansation:wght@300;400;700&display=swap" rel="stylesheet">
-  <!-- Leaflet CSS + JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -269,9 +266,139 @@
       margin-left: 12px;
       cursor: pointer;
     }
-    #map {
-      height: 55vh;
+    .festival-map-wrap {
+      position: relative;
+      width: 100%;
       border-radius: 28px;
+      overflow: hidden;
+      background: #1a4d2e;
+      line-height: 0;
+    }
+    .festival-map-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .map-markers {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .map-marker {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+      background: transparent;
+      z-index: 2;
+    }
+    .map-marker:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+    .marker-num {
+      width: clamp(22px, 5.5vw, 32px);
+      height: clamp(22px, 5.5vw, 32px);
+      border-radius: 50%;
+      background: #F03228;
+      color: #fff;
+      font-weight: 700;
+      font-size: clamp(0.65rem, 2.8vw, 0.85rem);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+      font-style: normal;
+    }
+    .marker-pin {
+      width: clamp(20px, 5vw, 28px);
+      height: clamp(26px, 6.5vw, 36px);
+      background: #F03228;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    }
+    .marker-pin i {
+      transform: rotate(45deg);
+      color: #fff;
+      font-size: clamp(0.55rem, 2.4vw, 0.75rem);
+    }
+    .marker-tree {
+      width: clamp(20px, 5vw, 28px);
+      height: clamp(20px, 5vw, 28px);
+      border-radius: 50%;
+      background: #4caf50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    }
+    .marker-tree i {
+      color: #fff;
+      font-size: clamp(0.55rem, 2.4vw, 0.75rem);
+    }
+    .marker-label {
+      transform: translate(-50%, -50%);
+      background: #F03228;
+      color: #fff;
+      font-weight: 700;
+      font-size: clamp(0.45rem, 2vw, 0.6rem);
+      padding: 3px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+      font-style: normal;
+    }
+    .map-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 1100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+    }
+    .map-popup-overlay.open {
+      display: flex;
+    }
+    .map-popup {
+      background: var(--card-light);
+      border-radius: 24px 24px 0 0;
+      padding: 20px;
+      width: 100%;
+      max-width: 420px;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+    body.dark .map-popup {
+      background: var(--card-dark);
+    }
+    .map-popup h3 {
+      margin-bottom: 8px;
+      color: var(--secondary);
+    }
+    body.dark .map-popup h3 {
+      color: #5bb4d4;
+    }
+    .map-messages {
+      margin: 12px 0;
+      font-size: 0.85rem;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .map-messages li {
+      margin-bottom: 6px;
+      list-style: none;
+      padding: 6px 10px;
+      background: rgba(240,50,40,0.08);
+      border-radius: 12px;
     }
     textarea, input {
       width: 100%;
@@ -348,12 +475,29 @@
 
   <!-- KAART PAGINA -->
   <div id="mapPage" class="page">
-    <div class="card" style="padding: 0;">
-      <div id="map" style="height: 55vh; width: 100%;"></div>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="festival-map-wrap" id="festivalMap">
+        <img src="assets/kaart-festival.png" alt="Festivalterrein kaart" class="festival-map-img" width="258" height="150">
+        <div class="map-markers" id="mapMarkers" aria-hidden="false"></div>
+      </div>
     </div>
     <p class="info-text" style="font-size:0.75rem; text-align:center;"><span data-i18n="map_hint">Tik op markers om berichten achter te laten.</span></p>
   </div>
 </main>
+
+<div id="mapPopupOverlay" class="map-popup-overlay" role="dialog" aria-modal="true" aria-labelledby="mapPopupTitle">
+  <div class="map-popup">
+    <div class="flex-between">
+      <h3 id="mapPopupTitle"></h3>
+      <button type="button" id="closeMapPopupBtn" style="background: transparent; font-size: 1.6rem; color: var(--accent);">&times;</button>
+    </div>
+    <p id="mapPopupDesc" style="font-size: 0.85rem; margin-bottom: 8px;"></p>
+    <ul class="map-messages" id="mapPopupMessages"></ul>
+    <label for="mapMessageInput" data-i18n="map_message_label" style="font-size: 0.8rem;">Laat een bericht achter</label>
+    <input type="text" id="mapMessageInput" maxlength="200" placeholder="">
+    <button type="button" id="mapMessageSubmit" style="margin-top: 10px; width: 100%;"><i class="fas fa-paper-plane"></i> <span data-i18n="map_message_send">Verstuur</span></button>
+  </div>
+</div>
 
 <nav class="bottom-nav">
   <button class="nav-item" data-nav="home"><i class="fas fa-home"></i><span data-i18n="nav_home">Home</span></button>
@@ -628,8 +772,8 @@
   // ----- Taalinstellingen (vereenvoudigd voor deze demo) -----
   let currentLang = 'nl';
   const translations = {
-    nl: { nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart", clear_favs: "Wis favorieten", fav_hint: "Klik op het sterretje om een act te favorieten. Je krijgt notificaties 15,10,5 min van tevoren.", stage_label: "Podium", time_label: "Tijd", genre_label: "Genre", notify_btn: "Notificaties inschakelen", map_hint: "Tik op markers om berichten achter te laten.", general_title: "❤️U Festival", general_desc: "Voor (nieuwe) studenten in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Zaterdag 5 september 2026, 12:00 - 23:00", contact_title: "Contact", access_title: "Bereikbaarheid", bike_text: "Gratis stalling, hele dag.", car_text: "P+R Papendorp, ticket online of PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Gratis shuttle vanaf Utrecht Centraal.", lockers_text: "Kluisjes voor 3-4 jassen.", med_q: "Medicatie?", med_a: "Toegestaan met doktersverklaring.", reentry_q: "Terrein verlaten?", reentry_a: "Nee, i.v.m. veiligheid.", glu_desc: "GLU-studenten met gouden armbandje: gouden toiletten en snelle bar." },
-    en: { nav_home: "Home", nav_info: "Info", nav_program: "Schedule", nav_map: "Map", clear_favs: "Clear favorites", fav_hint: "Click the star to favorite an act. You'll receive notifications 15,10,5 minutes before.", stage_label: "Stage", time_label: "Time", genre_label: "Genre", notify_btn: "Enable notifications", map_hint: "Tap markers to leave messages.", general_title: "❤️U Festival", general_desc: "For (new) students in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Saturday September 5, 2026, 12:00 - 23:00", contact_title: "Contact", access_title: "Accessibility", bike_text: "Free bicycle parking all day.", car_text: "P+R Papendorp, ticket online or PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Free shuttle from Utrecht Central.", lockers_text: "Lockers for 3-4 coats.", med_q: "Medication?", med_a: "Allowed with doctor's note.", reentry_q: "Leave & re-enter?", reentry_a: "No, for safety.", glu_desc: "GLU students with golden wristband: golden toilets & fast bar." }
+    nl: { nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart", clear_favs: "Wis favorieten", fav_hint: "Klik op het sterretje om een act te favorieten. Je krijgt notificaties 15,10,5 min van tevoren.", stage_label: "Podium", time_label: "Tijd", genre_label: "Genre", notify_btn: "Notificaties inschakelen", map_hint: "Tik op markers om berichten achter te laten.", map_message_label: "Laat een bericht achter", map_message_send: "Verstuur", map_message_placeholder: "Typ je bericht…", general_title: "❤️U Festival", general_desc: "Voor (nieuwe) studenten in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Zaterdag 5 september 2026, 12:00 - 23:00", contact_title: "Contact", access_title: "Bereikbaarheid", bike_text: "Gratis stalling, hele dag.", car_text: "P+R Papendorp, ticket online of PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Gratis shuttle vanaf Utrecht Centraal.", lockers_text: "Kluisjes voor 3-4 jassen.", med_q: "Medicatie?", med_a: "Toegestaan met doktersverklaring.", reentry_q: "Terrein verlaten?", reentry_a: "Nee, i.v.m. veiligheid.", glu_desc: "GLU-studenten met gouden armbandje: gouden toiletten en snelle bar." },
+    en: { nav_home: "Home", nav_info: "Info", nav_program: "Schedule", nav_map: "Map", clear_favs: "Clear favorites", fav_hint: "Click the star to favorite an act. You'll receive notifications 15,10,5 minutes before.", stage_label: "Stage", time_label: "Time", genre_label: "Genre", notify_btn: "Enable notifications", map_hint: "Tap markers to leave messages.", map_message_label: "Leave a message", map_message_send: "Send", map_message_placeholder: "Type your message…", general_title: "❤️U Festival", general_desc: "For (new) students in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Saturday September 5, 2026, 12:00 - 23:00", contact_title: "Contact", access_title: "Accessibility", bike_text: "Free bicycle parking all day.", car_text: "P+R Papendorp, ticket online or PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Free shuttle from Utrecht Central.", lockers_text: "Lockers for 3-4 coats.", med_q: "Medication?", med_a: "Allowed with doctor's note.", reentry_q: "Leave & re-enter?", reentry_a: "No, for safety.", glu_desc: "GLU students with golden wristband: golden toilets & fast bar." }
   };
   function applyLanguage() {
     const t = translations[currentLang];
@@ -638,28 +782,130 @@
       if (t[key]) el.innerText = t[key];
     });
     document.getElementById("langLabel").innerText = currentLang.toUpperCase();
-    renderSchedule(); // hertekenen om sterhints etc te updaten (maar tekst in grid is artiestennaam, die blijft ongewijzigd)
+    const msgInput = document.getElementById("mapMessageInput");
+    if (msgInput) msgInput.placeholder = t.map_message_placeholder || "";
+    renderSchedule();
+    initFestivalMap();
+    if (activeMapMarkerId) {
+      const marker = mapMarkersData.find(m => m.id === activeMapMarkerId);
+      if (marker) {
+        document.getElementById("mapPopupTitle").innerText = currentLang === "nl" ? marker.name_nl : marker.name_en;
+        document.getElementById("mapPopupDesc").innerText = currentLang === "nl" ? marker.desc_nl : marker.desc_en;
+        renderMapPopupMessages();
+      }
+    }
   }
   
-  // ----- Kaart & interactie (behouden) -----
-  let mapInstance = null, userMarker = null, mapMarkers = [];
-  const locationsData = [
-    { id: "mainStage", name_nl: "🎸 Hoofdpodium", name_en: "🎸 Main Stage", lat: 52.0919, lng: 5.1215, desc_nl: "Grootste podium", desc_en: "Biggest stage" },
-    { id: "foodPlaza", name_nl: "🍔 Foodplein", name_en: "🍔 Food Plaza", lat: 52.0920, lng: 5.1200, desc_nl: "Eten & drinken", desc_en: "Food & drinks" }
+  // ----- Festivalkaart (basisfoto + markers zoals referentie) -----
+  const mapMarkersData = [
+    { id: "poi1", type: "num", num: 1, x: 11, y: 42, name_nl: "Podium 1 – Poton", name_en: "Stage 1 – Poton", desc_nl: "Groot rood gebouw aan het water.", desc_en: "Large red building by the water." },
+    { id: "poi2", type: "num", num: 2, x: 38, y: 32, name_nl: "The Lake", name_en: "The Lake", desc_nl: "Lang gebouw aan de oever.", desc_en: "Long building on the shore." },
+    { id: "poi3", type: "num", num: 3, x: 62, y: 38, name_nl: "The Club", name_en: "The Club", desc_nl: "Terras en zwembad bij het water.", desc_en: "Terrace and pool by the water." },
+    { id: "poi4", type: "num", num: 4, x: 78, y: 14, name_nl: "Hanggar", name_en: "Hanggar", desc_nl: "Gestreepte tent / hal.", desc_en: "Striped tent / hall." },
+    { id: "tree", type: "tree", x: 7, y: 11, name_nl: "Bos / rustplek", name_en: "Woods / quiet area", desc_nl: "Groene zone linksboven.", desc_en: "Green area top left." },
+    { id: "food1", type: "pin", icon: "utensils", x: 17, y: 50, name_nl: "Eten & drinken", name_en: "Food & drinks", desc_nl: "Foodtrucks bij podium 1.", desc_en: "Food trucks near stage 1." },
+    { id: "food2", type: "pin", icon: "utensils", x: 54, y: 48, name_nl: "Foodplein", name_en: "Food plaza", desc_nl: "Eten bij The Club.", desc_en: "Food near The Club." },
+    { id: "food3", type: "pin", icon: "utensils", x: 72, y: 58, name_nl: "Snackbar", name_en: "Snack bar", desc_nl: "Klein eten rechtsonder.", desc_en: "Small food stand bottom right." },
+    { id: "tent1", type: "pin", icon: "campground", x: 22, y: 26, name_nl: "Camping / tenten", name_en: "Camping / tents", desc_nl: "Tentenveld bij de baai.", desc_en: "Tent field by the bay." },
+    { id: "tent2", type: "pin", icon: "campground", x: 28, y: 30, name_nl: "Camping", name_en: "Camping", desc_nl: "Extra tentplekken.", desc_en: "Additional tent spots." },
+    { id: "car1", type: "pin", icon: "car", x: 4, y: 48, name_nl: "Parkeren", name_en: "Parking", desc_nl: "Parkeerplaats links.", desc_en: "Parking area on the left." },
+    { id: "car2", type: "pin", icon: "car", x: 44, y: 7, name_nl: "Inrit", name_en: "Entrance", desc_nl: "Toegang bovenkant terrein.", desc_en: "Entrance at the top of the site." },
+    { id: "bed", type: "pin", icon: "bed", x: 42, y: 44, name_nl: "Rust / lounge", name_en: "Rest / lounge", desc_nl: "Chillplek bij The Lake.", desc_en: "Chill area near The Lake." },
+    { id: "mainStageLabel", type: "label", label: "MAIN STAGE", x: 50, y: 74, name_nl: "Main Stage", name_en: "Main Stage", desc_nl: "Hoofdpodium – centraal onderaan.", desc_en: "Main stage – center bottom." }
   ];
-  function initMap() {
-    if(mapInstance) mapInstance.remove();
-    mapInstance = L.map('map').setView([52.0915, 5.1210], 16);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapInstance);
-    mapInstance.locate({ setView: true });
-    mapInstance.on('locationfound', (e) => {
-      if(userMarker) mapInstance.removeLayer(userMarker);
-      userMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '<div style="background:#F03228; width:14px;height:14px;border-radius:50%;border:2px solid white;"></div>', iconSize: [14,14] }) }).addTo(mapInstance).bindPopup("Jij bent hier");
+
+  let activeMapMarkerId = null;
+  let mapMessages = {};
+
+  function loadMapMessages() {
+    try {
+      mapMessages = JSON.parse(localStorage.getItem("ufest_map_messages") || "{}");
+    } catch {
+      mapMessages = {};
+    }
+  }
+  function saveMapMessages() {
+    localStorage.setItem("ufest_map_messages", JSON.stringify(mapMessages));
+  }
+
+  function renderMapMarkerEl(marker) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "map-marker";
+    btn.style.left = marker.x + "%";
+    btn.style.top = marker.y + "%";
+    btn.setAttribute("data-id", marker.id);
+    btn.setAttribute("aria-label", currentLang === "nl" ? marker.name_nl : marker.name_en);
+
+    if (marker.type === "num") {
+      btn.innerHTML = `<span class="marker-num">${marker.num}</span>`;
+    } else if (marker.type === "pin") {
+      btn.innerHTML = `<span class="marker-pin"><i class="fas fa-${marker.icon}"></i></span>`;
+    } else if (marker.type === "tree") {
+      btn.innerHTML = `<span class="marker-tree"><i class="fas fa-tree"></i></span>`;
+    } else if (marker.type === "label") {
+      btn.className = "map-marker marker-label";
+      btn.textContent = marker.label;
+      btn.style.fontStyle = "normal";
+    }
+    btn.addEventListener("click", () => openMapPopup(marker.id));
+    return btn;
+  }
+
+  function initFestivalMap() {
+    const container = document.getElementById("mapMarkers");
+    if (!container) return;
+    container.innerHTML = "";
+    mapMarkersData.forEach(m => container.appendChild(renderMapMarkerEl(m)));
+  }
+
+  function openMapPopup(markerId) {
+    const marker = mapMarkersData.find(m => m.id === markerId);
+    if (!marker) return;
+    activeMapMarkerId = markerId;
+    document.getElementById("mapPopupTitle").innerText = currentLang === "nl" ? marker.name_nl : marker.name_en;
+    document.getElementById("mapPopupDesc").innerText = currentLang === "nl" ? marker.desc_nl : marker.desc_en;
+    renderMapPopupMessages();
+    document.getElementById("mapMessageInput").value = "";
+    document.getElementById("mapPopupOverlay").classList.add("open");
+  }
+
+  function closeMapPopup() {
+    document.getElementById("mapPopupOverlay").classList.remove("open");
+    activeMapMarkerId = null;
+  }
+
+  function renderMapPopupMessages() {
+    const list = document.getElementById("mapPopupMessages");
+    const msgs = mapMessages[activeMapMarkerId] || [];
+    list.innerHTML = msgs.length
+      ? msgs.map(t => `<li>${escapeHtml(t)}</li>`).join("")
+      : `<li style="opacity:0.6;font-style:italic;">${currentLang === "nl" ? "Nog geen berichten." : "No messages yet."}</li>`;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function submitMapMessage() {
+    const input = document.getElementById("mapMessageInput");
+    const text = (input.value || "").trim();
+    if (!text || !activeMapMarkerId) return;
+    if (!mapMessages[activeMapMarkerId]) mapMessages[activeMapMarkerId] = [];
+    mapMessages[activeMapMarkerId].push(text);
+    saveMapMessages();
+    input.value = "";
+    renderMapPopupMessages();
+  }
+
+  function setupMapPopup() {
+    document.getElementById("closeMapPopupBtn").addEventListener("click", closeMapPopup);
+    document.getElementById("mapPopupOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "mapPopupOverlay") closeMapPopup();
     });
-    locationsData.forEach(loc => {
-      const marker = L.marker([loc.lat, loc.lng]).addTo(mapInstance);
-      marker.bindPopup(currentLang === 'nl' ? loc.name_nl : loc.name_en);
-      mapMarkers.push(marker);
+    document.getElementById("mapMessageSubmit").addEventListener("click", submitMapMessage);
+    document.getElementById("mapMessageInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitMapMessage();
     });
   }
   
@@ -670,7 +916,6 @@
     document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[data-nav="${pageId}"]`);
     if(activeNav) activeNav.classList.add('active');
-    if(pageId === 'map' && mapInstance) setTimeout(() => mapInstance.invalidateSize(), 150);
   }
   function setupNav() {
     document.querySelectorAll('.nav-item').forEach(btn => {
@@ -681,8 +926,10 @@
   // Init alles
   window.addEventListener('DOMContentLoaded', () => {
     loadFavorites();
+    loadMapMessages();
     renderSchedule();
-    initMap();
+    initFestivalMap();
+    setupMapPopup();
     setupNav();
     applyLanguage();
     document.getElementById('langSwitchBtn').addEventListener('click', () => {
