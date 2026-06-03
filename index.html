@@ -4,11 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
   <meta name="theme-color" content="#F03228">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="❤️U Fest">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/app-icon.svg">
   <title>❤️U Festival · Blokkenschema</title>
   <!-- Google Fonts: Sansation -->
   <link href="https://fonts.googleapis.com/css2?family=Sansation:wght@300;400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -266,94 +271,118 @@
       margin-left: 12px;
       cursor: pointer;
     }
+    .map-layout-card {
+      padding: 0 !important;
+      overflow: hidden;
+    }
+    .map-with-legend {
+      display: flex;
+      align-items: stretch;
+      height: 65vh;
+      min-height: 300px;
+    }
     .festival-map-wrap {
       position: relative;
-      width: 100%;
-      border-radius: 28px;
+      flex: 1;
+      min-width: 0;
+      height: auto;
+      border-radius: 0;
       overflow: hidden;
-      background: #1a4d2e;
+      background: #157a21;
+      touch-action: none;
+    }
+    .map-viewport {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    .map-viewport.is-dragging {
+      cursor: grabbing;
+    }
+    .map-stage {
+      transform-origin: 0 0;
+      will-change: transform;
       line-height: 0;
     }
-    .festival-map-img {
-      width: 100%;
-      height: auto;
+    .festival-map-svg {
       display: block;
+      width: 2330.58px;
+      height: 1353.19px;
+      max-width: none;
     }
-    .map-markers {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-    .map-marker {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      pointer-events: auto;
+    .map-hotspot {
       cursor: pointer;
-      border: none;
-      padding: 0;
-      background: transparent;
-      z-index: 2;
     }
-    .map-marker:focus-visible {
+    .map-hotspot .hotspot-hit {
+      fill: transparent;
+      stroke: none;
+      pointer-events: all;
+    }
+    .map-hotspot:hover > circle:not(.hotspot-hit),
+    .map-hotspot:focus-visible > circle:not(.hotspot-hit) {
+      filter: brightness(1.12);
+    }
+    .map-hotspot:focus {
+      outline: none;
+    }
+    .map-hotspot:focus-visible {
       outline: 2px solid #fff;
       outline-offset: 2px;
     }
-    .marker-num {
-      width: clamp(22px, 5.5vw, 32px);
-      height: clamp(22px, 5.5vw, 32px);
-      border-radius: 50%;
-      background: #F03228;
-      color: #fff;
-      font-weight: 700;
-      font-size: clamp(0.65rem, 2.8vw, 0.85rem);
+    .map-stage-label {
+      cursor: pointer;
+    }
+    .map-stage-label:hover,
+    .map-stage-label:focus-visible {
+      filter: brightness(1.08);
+    }
+    .map-live-info {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(36, 123, 160, 0.12);
+      font-size: 0.85rem;
+    }
+    body.dark .map-live-info {
+      background: rgba(91, 180, 212, 0.12);
+    }
+    .map-legend-panel {
+      flex: 0 0 clamp(150px, 28vw, 220px);
+      display: flex;
+      flex-direction: column;
+      padding: 10px 8px 10px 6px;
+      background: var(--card-light);
+      border-left: 1px solid var(--border-light);
+    }
+    body.dark .map-legend-panel {
+      background: var(--card-dark);
+      border-left-color: var(--border-dark);
+    }
+    .map-legend-title {
+      flex-shrink: 0;
+      font-size: 0.75rem;
+      margin-bottom: 6px;
+      text-align: center;
+      color: var(--secondary);
+    }
+    body.dark .map-legend-title {
+      color: #5bb4d4;
+    }
+    .map-legend-wrap {
+      flex: 1;
+      min-height: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-      font-style: normal;
+      line-height: 0;
     }
-    .marker-pin {
-      width: clamp(20px, 5vw, 28px);
-      height: clamp(26px, 6.5vw, 36px);
-      background: #F03228;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-    }
-    .marker-pin i {
-      transform: rotate(45deg);
-      color: #fff;
-      font-size: clamp(0.55rem, 2.4vw, 0.75rem);
-    }
-    .marker-tree {
-      width: clamp(20px, 5vw, 28px);
-      height: clamp(20px, 5vw, 28px);
-      border-radius: 50%;
-      background: #4caf50;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-    }
-    .marker-tree i {
-      color: #fff;
-      font-size: clamp(0.55rem, 2.4vw, 0.75rem);
-    }
-    .marker-label {
-      transform: translate(-50%, -50%);
-      background: #F03228;
-      color: #fff;
-      font-weight: 700;
-      font-size: clamp(0.45rem, 2vw, 0.6rem);
-      padding: 3px 8px;
-      border-radius: 3px;
-      letter-spacing: 0.04em;
-      white-space: nowrap;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-      font-style: normal;
+    .map-legend-img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
     }
     .map-popup-overlay {
       position: fixed;
@@ -409,6 +438,41 @@
       font-family: 'Sansation', sans-serif;
       margin-top: 8px;
     }
+    .install-card {
+      text-align: center;
+    }
+    .install-card-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    #installQrCanvas {
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      max-width: 100%;
+      height: auto;
+    }
+    .install-url {
+      font-size: 0.7rem;
+      word-break: break-all;
+      opacity: 0.75;
+      max-width: 100%;
+    }
+    .install-steps {
+      font-size: 0.8rem;
+      text-align: left;
+      width: 100%;
+      line-height: 1.5;
+    }
+    #installAppBtn {
+      width: 100%;
+      max-width: 280px;
+      padding: 10px 16px;
+    }
+    #installAppBtn[hidden] {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -434,6 +498,19 @@
     <div class="card">
       <h3 data-i18n="contact_title">📞 Contact</h3>
       <p>📧 info@heartufestival.nl | 🌐 www.heartufestival.nl</p>
+    </div>
+    <div class="card install-card">
+      <h3 class="section-title" data-i18n="install_title">📲 Download de app</h3>
+      <p data-i18n="install_desc" style="font-size:0.85rem; margin-bottom:12px;">Scan de QR-code om de festival-app op je telefoon te openen en te installeren.</p>
+      <div class="install-card-inner">
+        <canvas id="installQrCanvas" width="200" height="200" aria-label="QR-code naar festival-app"></canvas>
+        <p id="installAppUrl" class="install-url"></p>
+        <button type="button" id="installAppBtn" hidden><i class="fas fa-download"></i> <span data-i18n="install_btn">Installeer app</span></button>
+        <div class="install-steps">
+          <p data-i18n="install_ios">iPhone: Open in Safari → Deel → Zet op beginscherm.</p>
+          <p data-i18n="install_android" style="margin-top:6px;">Android: Open de link → Installeer app (of ⋮ → Toevoegen aan startscherm).</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -475,13 +552,22 @@
 
   <!-- KAART PAGINA -->
   <div id="mapPage" class="page">
-    <div class="card" style="padding: 0; overflow: hidden;">
-      <div class="festival-map-wrap" id="festivalMap">
-        <img src="assets/kaart-festival.png" alt="Festivalterrein kaart" class="festival-map-img" width="258" height="150">
-        <div class="map-markers" id="mapMarkers" aria-hidden="false"></div>
+    <div class="card map-layout-card">
+      <div class="map-with-legend">
+        <div class="festival-map-wrap" id="festivalMap">
+          <div class="map-viewport" id="mapViewport">
+            <div class="map-stage" id="mapStage"></div>
+          </div>
+        </div>
+        <aside class="map-legend-panel" aria-label="Kaart legenda">
+          <h3 class="map-legend-title" data-i18n="map_legend_title">Legenda</h3>
+          <div class="map-legend-wrap">
+            <img src="assets/legenda.svg" alt="" class="map-legend-img" width="511" height="832">
+          </div>
+        </aside>
       </div>
     </div>
-    <p class="info-text" style="font-size:0.75rem; text-align:center;"><span data-i18n="map_hint">Tik op markers om berichten achter te laten.</span></p>
+    <p class="info-text" style="font-size:0.75rem; text-align:center;"><span data-i18n="map_hint">Tik op een icoon voor meer informatie.</span></p>
   </div>
 </main>
 
@@ -492,6 +578,7 @@
       <button type="button" id="closeMapPopupBtn" style="background: transparent; font-size: 1.6rem; color: var(--accent);">&times;</button>
     </div>
     <p id="mapPopupDesc" style="font-size: 0.85rem; margin-bottom: 8px;"></p>
+    <div id="mapPopupLive" class="map-live-info" hidden></div>
     <ul class="map-messages" id="mapPopupMessages"></ul>
     <label for="mapMessageInput" data-i18n="map_message_label" style="font-size: 0.8rem;">Laat een bericht achter</label>
     <input type="text" id="mapMessageInput" maxlength="200" placeholder="">
@@ -540,7 +627,7 @@
   // Verwijder laatste dubbele 26:30?
   // Maar we nemen eerste 20 slots voor demo, je kunt later aanvullen.
   // In het echte schema zijn er meer slots. Voor de leesbaarheid gebruiken we 10:00 t/m 02:00 met 30-min intervallen.
-  // We filteren tot 02:00 (26:00)
+  // We filteren tot 02:00 (26:00),
   const filteredSlots = timeSlots.filter((_, idx) => idx < 34); // tot ~02:00
   
   // Artist database (informatie per act)
@@ -660,6 +747,7 @@
     renderSchedule(); // hertekenen om sterren bij te werken
   }
   
+
   // Render het blokkenschema (grid)
   function renderSchedule() {
     const container = document.getElementById("scheduleGrid");
@@ -772,8 +860,8 @@
   // ----- Taalinstellingen (vereenvoudigd voor deze demo) -----
   let currentLang = 'nl';
   const translations = {
-    nl: { nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart", clear_favs: "Wis favorieten", fav_hint: "Klik op het sterretje om een act te favorieten. Je krijgt notificaties 15,10,5 min van tevoren.", stage_label: "Podium", time_label: "Tijd", genre_label: "Genre", notify_btn: "Notificaties inschakelen", map_hint: "Tik op markers om berichten achter te laten.", map_message_label: "Laat een bericht achter", map_message_send: "Verstuur", map_message_placeholder: "Typ je bericht…", general_title: "❤️U Festival", general_desc: "Voor (nieuwe) studenten in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Zaterdag 5 september 2026, 12:00 - 23:00", contact_title: "Contact", access_title: "Bereikbaarheid", bike_text: "Gratis stalling, hele dag.", car_text: "P+R Papendorp, ticket online of PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Gratis shuttle vanaf Utrecht Centraal.", lockers_text: "Kluisjes voor 3-4 jassen.", med_q: "Medicatie?", med_a: "Toegestaan met doktersverklaring.", reentry_q: "Terrein verlaten?", reentry_a: "Nee, i.v.m. veiligheid.", glu_desc: "GLU-studenten met gouden armbandje: gouden toiletten en snelle bar." },
-    en: { nav_home: "Home", nav_info: "Info", nav_program: "Schedule", nav_map: "Map", clear_favs: "Clear favorites", fav_hint: "Click the star to favorite an act. You'll receive notifications 15,10,5 minutes before.", stage_label: "Stage", time_label: "Time", genre_label: "Genre", notify_btn: "Enable notifications", map_hint: "Tap markers to leave messages.", map_message_label: "Leave a message", map_message_send: "Send", map_message_placeholder: "Type your message…", general_title: "❤️U Festival", general_desc: "For (new) students in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Saturday September 5, 2026, 12:00 - 23:00", contact_title: "Contact", access_title: "Accessibility", bike_text: "Free bicycle parking all day.", car_text: "P+R Papendorp, ticket online or PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Free shuttle from Utrecht Central.", lockers_text: "Lockers for 3-4 coats.", med_q: "Medication?", med_a: "Allowed with doctor's note.", reentry_q: "Leave & re-enter?", reentry_a: "No, for safety.", glu_desc: "GLU students with golden wristband: golden toilets & fast bar." }
+    nl: { nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart", clear_favs: "Wis favorieten", fav_hint: "Klik op het sterretje om een act te favorieten. Je krijgt notificaties 15,10,5 min van tevoren.", stage_label: "Podium", time_label: "Tijd", genre_label: "Genre", notify_btn: "Notificaties inschakelen", map_hint: "Tik op een icoon voor meer informatie.", map_legend_title: "Legenda", map_message_label: "Laat een bericht achter", map_message_send: "Verstuur", map_message_placeholder: "Typ je bericht…", general_title: "❤️U Festival", general_desc: "Voor (nieuwe) studenten in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Zaterdag 5 september 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download de app", install_desc: "Scan de QR-code om de festival-app op je telefoon te openen en te installeren.", install_btn: "Installeer app", install_ios: "iPhone: Open in Safari → Deel → Zet op beginscherm.", install_android: "Android: Open de link → Installeer app (of ⋮ → Toevoegen aan startscherm).", access_title: "Bereikbaarheid", bike_text: "Gratis stalling, hele dag.", car_text: "P+R Papendorp, ticket online of PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Gratis shuttle vanaf Utrecht Centraal.", lockers_text: "Kluisjes voor 3-4 jassen.", med_q: "Medicatie?", med_a: "Toegestaan met doktersverklaring.", reentry_q: "Terrein verlaten?", reentry_a: "Nee, i.v.m. veiligheid.", glu_desc: "GLU-studenten met gouden armbandje: gouden toiletten en snelle bar." },
+    en: { nav_home: "Home", nav_info: "Info", nav_program: "Schedule", nav_map: "Map", clear_favs: "Clear favorites", fav_hint: "Click the star to favorite an act. You'll receive notifications 15,10,5 minutes before.", stage_label: "Stage", time_label: "Time", genre_label: "Genre", notify_btn: "Enable notifications", map_hint: "Tap an icon for more information.", map_legend_title: "Legend", map_message_label: "Leave a message", map_message_send: "Send", map_message_placeholder: "Type your message…", general_title: "❤️U Festival", general_desc: "For (new) students in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Saturday September 5, 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download the app", install_desc: "Scan the QR code to open and install the festival app on your phone.", install_btn: "Install app", install_ios: "iPhone: Open in Safari → Share → Add to Home Screen.", install_android: "Android: Open the link → Install app (or ⋮ → Add to Home screen).", access_title: "Accessibility", bike_text: "Free bicycle parking all day.", car_text: "P+R Papendorp, ticket online or PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Free shuttle from Utrecht Central.", lockers_text: "Lockers for 3-4 coats.", med_q: "Medication?", med_a: "Allowed with doctor's note.", reentry_q: "Leave & re-enter?", reentry_a: "No, for safety.", glu_desc: "GLU students with golden wristband: golden toilets & fast bar." }
   };
   function applyLanguage() {
     const t = translations[currentLang];
@@ -785,37 +873,45 @@
     const msgInput = document.getElementById("mapMessageInput");
     if (msgInput) msgInput.placeholder = t.map_message_placeholder || "";
     renderSchedule();
-    initFestivalMap();
-    if (activeMapMarkerId) {
-      const marker = mapMarkersData.find(m => m.id === activeMapMarkerId);
-      if (marker) {
-        document.getElementById("mapPopupTitle").innerText = currentLang === "nl" ? marker.name_nl : marker.name_en;
-        document.getElementById("mapPopupDesc").innerText = currentLang === "nl" ? marker.desc_nl : marker.desc_en;
-        renderMapPopupMessages();
-      }
-    }
+    refreshMapHotspotLabels();
+    if (activeMapMarkerId) refreshMapPopupContent();
   }
   
-  // ----- Festivalkaart (basisfoto + markers zoals referentie) -----
-  const mapMarkersData = [
-    { id: "poi1", type: "num", num: 1, x: 11, y: 42, name_nl: "Podium 1 – Poton", name_en: "Stage 1 – Poton", desc_nl: "Groot rood gebouw aan het water.", desc_en: "Large red building by the water." },
-    { id: "poi2", type: "num", num: 2, x: 38, y: 32, name_nl: "The Lake", name_en: "The Lake", desc_nl: "Lang gebouw aan de oever.", desc_en: "Long building on the shore." },
-    { id: "poi3", type: "num", num: 3, x: 62, y: 38, name_nl: "The Club", name_en: "The Club", desc_nl: "Terras en zwembad bij het water.", desc_en: "Terrace and pool by the water." },
-    { id: "poi4", type: "num", num: 4, x: 78, y: 14, name_nl: "Hanggar", name_en: "Hanggar", desc_nl: "Gestreepte tent / hal.", desc_en: "Striped tent / hall." },
-    { id: "tree", type: "tree", x: 7, y: 11, name_nl: "Bos / rustplek", name_en: "Woods / quiet area", desc_nl: "Groene zone linksboven.", desc_en: "Green area top left." },
-    { id: "food1", type: "pin", icon: "utensils", x: 17, y: 50, name_nl: "Eten & drinken", name_en: "Food & drinks", desc_nl: "Foodtrucks bij podium 1.", desc_en: "Food trucks near stage 1." },
-    { id: "food2", type: "pin", icon: "utensils", x: 54, y: 48, name_nl: "Foodplein", name_en: "Food plaza", desc_nl: "Eten bij The Club.", desc_en: "Food near The Club." },
-    { id: "food3", type: "pin", icon: "utensils", x: 72, y: 58, name_nl: "Snackbar", name_en: "Snack bar", desc_nl: "Klein eten rechtsonder.", desc_en: "Small food stand bottom right." },
-    { id: "tent1", type: "pin", icon: "campground", x: 22, y: 26, name_nl: "Camping / tenten", name_en: "Camping / tents", desc_nl: "Tentenveld bij de baai.", desc_en: "Tent field by the bay." },
-    { id: "tent2", type: "pin", icon: "campground", x: 28, y: 30, name_nl: "Camping", name_en: "Camping", desc_nl: "Extra tentplekken.", desc_en: "Additional tent spots." },
-    { id: "car1", type: "pin", icon: "car", x: 4, y: 48, name_nl: "Parkeren", name_en: "Parking", desc_nl: "Parkeerplaats links.", desc_en: "Parking area on the left." },
-    { id: "car2", type: "pin", icon: "car", x: 44, y: 7, name_nl: "Inrit", name_en: "Entrance", desc_nl: "Toegang bovenkant terrein.", desc_en: "Entrance at the top of the site." },
-    { id: "bed", type: "pin", icon: "bed", x: 42, y: 44, name_nl: "Rust / lounge", name_en: "Rest / lounge", desc_nl: "Chillplek bij The Lake.", desc_en: "Chill area near The Lake." },
-    { id: "mainStageLabel", type: "label", label: "MAIN STAGE", x: 50, y: 74, name_nl: "Main Stage", name_en: "Main Stage", desc_nl: "Hoofdpodium – centraal onderaan.", desc_en: "Main stage – center bottom." }
+  // ----- Festivalkaart (SVG + klikbare iconen) -----
+  const MAP_SVG_PATH = "assets/kaart_festival_markers.svg";
+  const MAP_VIEWBOX = { width: 2330.58, height: 1353.19 };
+
+  const mapLocations = [
+    { id: "ponton", cx: 496.9, cy: 849.15, stage: "Poton", name_nl: "Ponton", name_en: "Ponton", desc_nl: "Main stage – hoofdacts.", desc_en: "Main stage – headliners." },
+    { id: "the-lake", cx: 1256.98, cy: 615.25, stage: "The Lake", name_nl: "The Lake", name_en: "The Lake", desc_nl: "Podium voor onbekend talent.", desc_en: "Stage for emerging talent." },
+    { id: "the-club", cx: 1614.31, cy: 528.68, stage: "The Club", name_nl: "The Club", name_en: "The Club", desc_nl: "Theater en stand-up comedy.", desc_en: "Theatre and stand-up comedy." },
+    { id: "hangar", cx: 2102.13, cy: 231.18, stage: "Hanggar", name_nl: "Hangar", name_en: "Hangar", desc_nl: "Non-stop house, techno en dance.", desc_en: "Non-stop house, techno and dance." },
+    { id: "entrance-1", cx: 2169.13, cy: 336.08, name_nl: "Ingang / uitgang", name_en: "Entrance / exit", desc_nl: "Toegang tot het terrein.", desc_en: "Access to the festival site." },
+    { id: "entrance-2", cx: 181.73, cy: 1063.32, name_nl: "Ingang / uitgang", name_en: "Entrance / exit", desc_nl: "Toegang links onderaan.", desc_en: "Entrance bottom left." },
+    { id: "entrance-3", cx: 1140.21, cy: 383.62, name_nl: "Ingang / uitgang", name_en: "Entrance / exit", desc_nl: "Toegang bovenkant terrein.", desc_en: "Entrance at the top of the site." },
+    { id: "bar-1", cx: 282.73, cy: 849.15, name_nl: "Bar", name_en: "Bar", desc_nl: "Drankjes bij Ponton.", desc_en: "Drinks near Ponton." },
+    { id: "bar-2", cx: 821.69, cy: 596.04, name_nl: "Bar", name_en: "Bar", desc_nl: "Drankjes bij het meer.", desc_en: "Drinks by the lake." },
+    { id: "food-1", cx: 406.66, cy: 1063.98, name_nl: "Eten", name_en: "Food", desc_nl: "Eten en snacks.", desc_en: "Food and snacks." },
+    { id: "food-2", cx: 1524.78, cy: 535.62, name_nl: "Eten", name_en: "Food", desc_nl: "Foodtrucks.", desc_en: "Food trucks." },
+    { id: "food-3", cx: 739.26, cy: 540.1, name_nl: "Eten", name_en: "Food", desc_nl: "Eten bij het water.", desc_en: "Food by the water." },
+    { id: "first-aid", cx: 423.63, cy: 413.99, name_nl: "EHBO", name_en: "First aid", desc_nl: "Eerste hulp post.", desc_en: "First aid post." },
+    { id: "merch-1", cx: 1936.52, cy: 243.62, name_nl: "Merchandise", name_en: "Merchandise", desc_nl: "Festival merchandise.", desc_en: "Festival merchandise." },
+    { id: "merch-2", cx: 1458.48, cy: 447.69, name_nl: "Merchandise", name_en: "Merchandise", desc_nl: "Merchandise stand.", desc_en: "Merchandise stand." },
+    { id: "merch-3", cx: 913.03, cy: 567.28, name_nl: "Merchandise", name_en: "Merchandise", desc_nl: "Merchandise stand.", desc_en: "Merchandise stand." },
+    { id: "merch-4", cx: 614.93, cy: 907.94, name_nl: "Merchandise", name_en: "Merchandise", desc_nl: "Merchandise stand.", desc_en: "Merchandise stand." },
+    { id: "toilet-1", cx: 1888.46, cy: 379.38, name_nl: "Toilet", name_en: "Toilet", desc_nl: "Toiletten.", desc_en: "Toilets." },
+    { id: "toilet-2", cx: 1678.28, cy: 390.08, name_nl: "Toilet", name_en: "Toilet", desc_nl: "Toiletten.", desc_en: "Toilets." },
+    { id: "toilet-3", cx: 1196.86, cy: 551.45, name_nl: "Toilet", name_en: "Toilet", desc_nl: "Toiletten.", desc_en: "Toilets." },
+    { id: "toilet-4", cx: 274.23, cy: 997.53, name_nl: "Toilet", name_en: "Toilet", desc_nl: "Toiletten.", desc_en: "Toilets." },
+    { id: "locker-1", cx: 559.13, cy: 1121.03, name_nl: "Kluisje", name_en: "Locker", desc_nl: "Kluisjes voor jassen.", desc_en: "Lockers for coats." },
+    { id: "locker-2", cx: 707.52, cy: 1105.01, name_nl: "Kluisje", name_en: "Locker", desc_nl: "Kluisjes voor jassen.", desc_en: "Lockers for coats." },
+    { id: "main-stage-label", kind: "label", name_nl: "Main Stage", name_en: "Main Stage", desc_nl: "Hoofdpodium – Ponton.", desc_en: "Main stage – Ponton.", stage: "Poton" }
   ];
 
   let activeMapMarkerId = null;
   let mapMessages = {};
+  let mapReady = false;
+  let mapTransform = { x: 0, y: 0, scale: 1 };
 
   function loadMapMessages() {
     try {
@@ -828,44 +924,269 @@
     localStorage.setItem("ufest_map_messages", JSON.stringify(mapMessages));
   }
 
-  function renderMapMarkerEl(marker) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "map-marker";
-    btn.style.left = marker.x + "%";
-    btn.style.top = marker.y + "%";
-    btn.setAttribute("data-id", marker.id);
-    btn.setAttribute("aria-label", currentLang === "nl" ? marker.name_nl : marker.name_en);
-
-    if (marker.type === "num") {
-      btn.innerHTML = `<span class="marker-num">${marker.num}</span>`;
-    } else if (marker.type === "pin") {
-      btn.innerHTML = `<span class="marker-pin"><i class="fas fa-${marker.icon}"></i></span>`;
-    } else if (marker.type === "tree") {
-      btn.innerHTML = `<span class="marker-tree"><i class="fas fa-tree"></i></span>`;
-    } else if (marker.type === "label") {
-      btn.className = "map-marker marker-label";
-      btn.textContent = marker.label;
-      btn.style.fontStyle = "normal";
+  function findHotspotGroup(svg, cx, cy, tolerance = 3) {
+    const symbolen = svg.querySelector("#Symbolen");
+    if (!symbolen) return null;
+    for (const circle of symbolen.querySelectorAll("circle")) {
+      if (circle.classList.contains("hotspot-hit")) continue;
+      const gcx = parseFloat(circle.getAttribute("cx"));
+      const gcy = parseFloat(circle.getAttribute("cy"));
+      if (Math.abs(gcx - cx) < tolerance && Math.abs(gcy - cy) < tolerance) {
+        return circle.parentElement;
+      }
     }
-    btn.addEventListener("click", () => openMapPopup(marker.id));
-    return btn;
+    return null;
   }
 
-  function initFestivalMap() {
-    const container = document.getElementById("mapMarkers");
-    if (!container) return;
-    container.innerHTML = "";
-    mapMarkersData.forEach(m => container.appendChild(renderMapMarkerEl(m)));
+  function addHotspotHitArea(group) {
+    const circle = group.querySelector("circle:not(.hotspot-hit)");
+    if (!circle || group.querySelector(".hotspot-hit")) return;
+    const hit = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    hit.setAttribute("cx", circle.getAttribute("cx"));
+    hit.setAttribute("cy", circle.getAttribute("cy"));
+    hit.setAttribute("r", String(parseFloat(circle.getAttribute("r") || 20) + 10));
+    hit.setAttribute("class", "hotspot-hit");
+    group.insertBefore(hit, circle);
+  }
+
+  function wireMapHotspot(group, location) {
+    group.classList.add("map-hotspot");
+    group.setAttribute("data-marker-id", location.id);
+    group.setAttribute("role", "button");
+    group.setAttribute("tabindex", "0");
+    group.setAttribute("aria-label", currentLang === "nl" ? location.name_nl : location.name_en);
+    addHotspotHitArea(group);
+    group.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openMapPopup(location.id);
+    });
+    group.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openMapPopup(location.id);
+      }
+    });
+  }
+
+  function wireMainStageLabel(svg) {
+    const labelGroup = svg.querySelector("#Symbolen rect.st11")?.closest("g");
+    const location = mapLocations.find(l => l.id === "main-stage-label");
+    if (!labelGroup || !location) return;
+    labelGroup.classList.add("map-stage-label");
+    labelGroup.setAttribute("data-marker-id", location.id);
+    labelGroup.setAttribute("role", "button");
+    labelGroup.setAttribute("tabindex", "0");
+    labelGroup.setAttribute("aria-label", currentLang === "nl" ? location.name_nl : location.name_en);
+    labelGroup.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openMapPopup(location.id);
+    });
+    labelGroup.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openMapPopup(location.id);
+      }
+    });
+  }
+
+  function applyMapTransform() {
+    const stage = document.getElementById("mapStage");
+    if (!stage) return;
+    stage.style.transform = `translate(${mapTransform.x}px, ${mapTransform.y}px) scale(${mapTransform.scale})`;
+  }
+
+  function fitMapToViewport() {
+    const viewport = document.getElementById("mapViewport");
+    if (!viewport) return;
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    const scale = Math.min(vw / MAP_VIEWBOX.width, vh / MAP_VIEWBOX.height);
+    mapTransform.scale = scale;
+    mapTransform.x = (vw - MAP_VIEWBOX.width * scale) / 2;
+    mapTransform.y = (vh - MAP_VIEWBOX.height * scale) / 2;
+    applyMapTransform();
+  }
+
+  function setupMapPanZoom() {
+    const viewport = document.getElementById("mapViewport");
+    if (!viewport) return;
+
+    let dragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let origin = { x: 0, y: 0 };
+    let pinchStartDistance = 0;
+    let pinchStartScale = 1;
+
+    const getPoint = (e) => {
+      if (e.touches?.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      return { x: e.clientX, y: e.clientY };
+    };
+
+    const onPointerDown = (e) => {
+      if (e.target.closest(".map-hotspot, .map-stage-label")) return;
+      dragging = true;
+      viewport.classList.add("is-dragging");
+      const p = getPoint(e);
+      dragStart = p;
+      origin = { x: mapTransform.x, y: mapTransform.y };
+    };
+
+    const onPointerMove = (e) => {
+      if (!dragging) return;
+      const p = getPoint(e);
+      mapTransform.x = origin.x + (p.x - dragStart.x);
+      mapTransform.y = origin.y + (p.y - dragStart.y);
+      applyMapTransform();
+    };
+
+    const endDrag = () => {
+      dragging = false;
+      viewport.classList.remove("is-dragging");
+    };
+
+    viewport.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("mousemove", onPointerMove);
+    window.addEventListener("mouseup", endDrag);
+    viewport.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchStartDistance = Math.hypot(dx, dy);
+        pinchStartScale = mapTransform.scale;
+        return;
+      }
+      onPointerDown(e);
+    }, { passive: true });
+    viewport.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 2 && pinchStartDistance) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        mapTransform.scale = Math.min(3, Math.max(0.4, pinchStartScale * (dist / pinchStartDistance)));
+        applyMapTransform();
+        return;
+      }
+      onPointerMove(e);
+    }, { passive: true });
+    viewport.addEventListener("touchend", endDrag);
+
+    viewport.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const rect = viewport.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const prevScale = mapTransform.scale;
+      const factor = e.deltaY < 0 ? 1.08 : 0.92;
+      const nextScale = Math.min(3, Math.max(0.4, prevScale * factor));
+      const ratio = nextScale / prevScale;
+      mapTransform.x = mx - (mx - mapTransform.x) * ratio;
+      mapTransform.y = my - (my - mapTransform.y) * ratio;
+      mapTransform.scale = nextScale;
+      applyMapTransform();
+    }, { passive: false });
+  }
+
+  async function initFestivalMap() {
+    const stage = document.getElementById("mapStage");
+    if (!stage || mapReady) return;
+    try {
+      const response = await fetch(MAP_SVG_PATH);
+      const svgText = await response.text();
+      stage.innerHTML = svgText;
+      const svg = stage.querySelector("svg");
+      if (!svg) return;
+      svg.classList.add("festival-map-svg");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", "Festivalterrein kaart");
+
+      mapLocations.forEach((location) => {
+        if (location.kind === "label") return;
+        const group = findHotspotGroup(svg, location.cx, location.cy);
+        if (group) wireMapHotspot(group, location);
+      });
+      wireMainStageLabel(svg);
+
+      fitMapToViewport();
+      setupMapPanZoom();
+      mapReady = true;
+    } catch (err) {
+      stage.innerHTML = `<p style="padding:20px;color:white;">${currentLang === "nl" ? "Kaart kon niet geladen worden." : "Could not load map."}</p>`;
+      console.error(err);
+    }
+  }
+
+  function refreshMapHotspotLabels() {
+    document.querySelectorAll("#mapStage [data-marker-id]").forEach((el) => {
+      const location = mapLocations.find(l => l.id === el.getAttribute("data-marker-id"));
+      if (location) el.setAttribute("aria-label", currentLang === "nl" ? location.name_nl : location.name_en);
+    });
+  }
+
+  function getStageScheduleInfo(stageName) {
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const currentMinutes = hour * 60 + minute;
+
+    let currentAct = null;
+    let currentSlot = null;
+    let nextAct = null;
+    let nextSlot = null;
+
+    filteredSlots.forEach((slot) => {
+      const artist = scheduleData[stageName]?.[slot];
+      if (!artist) return;
+      const [startStr, endStr] = slot.split(" - ");
+      const [sh, sm] = startStr.split(":").map(Number);
+      const [eh, em] = endStr.split(":").map(Number);
+      let startMin = sh * 60 + sm;
+      let endMin = eh * 60 + em;
+      if (endMin <= startMin) endMin += 24 * 60;
+      let compareMin = currentMinutes;
+      if (sh >= 0 && sh < 10 && hour >= 22) compareMin += 24 * 60;
+
+      if (compareMin >= startMin && compareMin < endMin) {
+        currentAct = artist;
+        currentSlot = slot;
+      } else if (startMin > compareMin && !nextAct) {
+        nextAct = artist;
+        nextSlot = slot;
+      }
+    });
+
+    return { currentAct, currentSlot, nextAct, nextSlot };
+  }
+
+  function refreshMapPopupContent() {
+    const marker = mapLocations.find(m => m.id === activeMapMarkerId);
+    if (!marker) return;
+    document.getElementById("mapPopupTitle").innerText = currentLang === "nl" ? marker.name_nl : marker.name_en;
+    document.getElementById("mapPopupDesc").innerText = currentLang === "nl" ? marker.desc_nl : marker.desc_en;
+
+    const liveEl = document.getElementById("mapPopupLive");
+    if (marker.stage) {
+      const info = getStageScheduleInfo(marker.stage);
+      let html = "";
+      if (info.currentAct) {
+        html += `<strong>${currentLang === "nl" ? "Nu:" : "Now:"}</strong> ${info.currentAct} (${info.currentSlot})<br>`;
+      } else {
+        html += `<em>${currentLang === "nl" ? "Geen act op dit moment." : "No act right now."}</em><br>`;
+      }
+      if (info.nextAct) {
+        html += `<strong>${currentLang === "nl" ? "Volgende:" : "Next:"}</strong> ${info.nextAct} (${info.nextSlot})`;
+      }
+      liveEl.innerHTML = html;
+      liveEl.hidden = false;
+    } else {
+      liveEl.hidden = true;
+      liveEl.innerHTML = "";
+    }
+    renderMapPopupMessages();
   }
 
   function openMapPopup(markerId) {
-    const marker = mapMarkersData.find(m => m.id === markerId);
-    if (!marker) return;
     activeMapMarkerId = markerId;
-    document.getElementById("mapPopupTitle").innerText = currentLang === "nl" ? marker.name_nl : marker.name_en;
-    document.getElementById("mapPopupDesc").innerText = currentLang === "nl" ? marker.desc_nl : marker.desc_en;
-    renderMapPopupMessages();
+    refreshMapPopupContent();
     document.getElementById("mapMessageInput").value = "";
     document.getElementById("mapPopupOverlay").classList.add("open");
   }
@@ -910,12 +1231,64 @@
   }
   
   // Navigatie & initialisatie
+  let deferredInstallPrompt = null;
+
+  function getAppInstallUrl() {
+    const url = new URL(window.location.href);
+    url.hash = "";
+    url.search = "";
+    let path = url.pathname;
+    if (/index\.html$/i.test(path)) path = path.replace(/index\.html$/i, "");
+    if (!path.endsWith("/")) path += "/";
+    url.pathname = path;
+    return url.href;
+  }
+
+  async function setupInstallQr() {
+    const appUrl = getAppInstallUrl();
+    const urlEl = document.getElementById("installAppUrl");
+    if (urlEl) urlEl.textContent = appUrl;
+    const canvas = document.getElementById("installQrCanvas");
+    if (!canvas || typeof QRCode === "undefined") return;
+    try {
+      await QRCode.toCanvas(canvas, appUrl, {
+        width: 200,
+        margin: 1,
+        color: { dark: "#000000", light: "#ffffff" }
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function setupPwaInstall() {
+    const btn = document.getElementById("installAppBtn");
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (btn) btn.hidden = false;
+    });
+    if (btn) {
+      btn.addEventListener("click", async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        btn.hidden = true;
+      });
+    }
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
+  }
+
   function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
     document.getElementById(`${pageId}Page`).classList.add('active-page');
     document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[data-nav="${pageId}"]`);
     if(activeNav) activeNav.classList.add('active');
+    if (pageId === 'map' && mapReady) setTimeout(() => fitMapToViewport(), 100);
   }
   function setupNav() {
     document.querySelectorAll('.nav-item').forEach(btn => {
@@ -950,6 +1323,8 @@
       document.getElementById('modalOverlay').classList.remove('open');
     });
     setupNotificationTest();
+    setupInstallQr();
+    setupPwaInstall();
     showPage('home');
   });
 </script>
