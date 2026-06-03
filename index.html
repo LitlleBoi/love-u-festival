@@ -453,6 +453,13 @@
       max-width: 100%;
       height: auto;
     }
+    #installQrImage {
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
     .install-url {
       font-size: 0.7rem;
       word-break: break-all;
@@ -503,7 +510,8 @@
       <h3 class="section-title" data-i18n="install_title">📲 Download de app</h3>
       <p data-i18n="install_desc" style="font-size:0.85rem; margin-bottom:12px;">Scan de QR-code om de festival-app op je telefoon te openen en te installeren.</p>
       <div class="install-card-inner">
-        <canvas id="installQrCanvas" width="200" height="200" aria-label="QR-code naar festival-app"></canvas>
+        <canvas id="installQrCanvas" width="200" height="200" aria-label="QR-code naar festival-app" style="display:none;"></canvas>
+        <img id="installQrImage" src="assets/qrcode.png" width="200" height="200" alt="QR-code naar festival-app">
         <p id="installAppUrl" class="install-url"></p>
         <button type="button" id="installAppBtn" hidden><i class="fas fa-download"></i> <span data-i18n="install_btn">Installeer app</span></button>
         <div class="install-steps">
