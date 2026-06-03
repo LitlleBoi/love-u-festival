@@ -1257,15 +1257,43 @@
     const urlEl = document.getElementById("installAppUrl");
     if (urlEl) urlEl.textContent = appUrl;
     const canvas = document.getElementById("installQrCanvas");
-    if (!canvas || typeof QRCode === "undefined") return;
+    const img = document.getElementById("installQrImage");
+
+    // Ensure image uses absolute URL (avoids base-path issues when deployed)
     try {
-      await QRCode.toCanvas(canvas, appUrl, {
-        width: 200,
-        margin: 1,
-        color: { dark: "#000000", light: "#ffffff" }
-      });
-    } catch (err) {
-      console.error(err);
+      if (img) img.src = new URL('assets/qrcode.png', window.location.href).href;
+    } catch {}
+
+    const tryGenerate = async () => {
+      if (!canvas || typeof QRCode === "undefined") return;
+      try {
+        await QRCode.toCanvas(canvas, appUrl, {
+          width: 200,
+          margin: 1,
+          color: { dark: "#000000", light: "#ffffff" }
+        });
+        canvas.style.display = 'block';
+        if (img) img.style.display = 'none';
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (img) {
+      img.onload = () => {
+        img.style.display = 'block';
+        if (canvas) canvas.style.display = 'none';
+      };
+      img.onerror = () => {
+        tryGenerate();
+      };
+      // If already finished loading (cached)
+      if (img.complete) {
+        if (img.naturalWidth && img.naturalWidth > 0) img.onload();
+        else img.onerror();
+      }
+    } else {
+      await tryGenerate();
     }
   }
 
