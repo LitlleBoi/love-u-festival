@@ -460,6 +460,12 @@
       height: auto;
       display: block;
     }
+    .install-fallback-note {
+      font-size: 0.8rem;
+      color: rgba(0,0,0,0.6);
+      margin-top: 8px;
+      text-align: center;
+    }
     .install-url {
       font-size: 0.7rem;
       word-break: break-all;
@@ -1258,43 +1264,79 @@
     if (urlEl) urlEl.textContent = appUrl;
     const canvas = document.getElementById("installQrCanvas");
     const img = document.getElementById("installQrImage");
-
-    // Ensure image uses absolute URL (avoids base-path issues when deployed)
-    try {
-      if (img) img.src = new URL('assets/qrcode.png', window.location.href).href;
-    } catch {}
-
-    const tryGenerate = async () => {
-      if (!canvas || typeof QRCode === "undefined") return;
-      try {
-        await QRCode.toCanvas(canvas, appUrl, {
-          width: 200,
-          margin: 1,
-          color: { dark: "#000000", light: "#ffffff" }
-        });
-        canvas.style.display = 'block';
-        if (img) img.style.display = 'none';
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (img) {
-      img.onload = () => {
-        img.style.display = 'block';
-        if (canvas) canvas.style.display = 'none';
-      };
-      img.onerror = () => {
-        tryGenerate();
-      };
-      // If already finished loading (cached)
-      if (img.complete) {
-        if (img.naturalWidth && img.naturalWidth > 0) img.onload();
-        else img.onerror();
-      }
-    } else {
-      await tryGenerate();
+    let fallbackNote = document.getElementById('installFallbackNote');
+    if (!fallbackNote) {
+      fallbackNote = document.createElement('div');
+      fallbackNote.id = 'installFallbackNote';
+      fallbackNote.className = 'install-fallback-note';
+      const parent = document.querySelector('.install-card-inner');
+      if (parent) parent.appendChild(fallbackNote);
     }
+
+    const candidateUrls = [];
+    try {
+      // Common variants to handle different hosting roots
+      candidateUrls.push(new URL('assets/qrcode.png', window.location.href).href);
+      candidateUrls.push(new URL('./assets/qrcode.png', window.location.href).href);
+      candidateUrls.push(new URL('/assets/qrcode.png', window.location.origin).href);
+      // Try relative to document base if present
+      if (document.baseURI) candidateUrls.push(new URL('assets/qrcode.png', document.baseURI).href);
+    } catch (e) {
+      // ignore
+    }
+
+    // Remove duplicates
+    const uniq = [...new Set(candidateUrls)];
+
+    async function checkUrl(url, timeout = 3000) {
+      try {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        const resp = await fetch(url, { method: 'GET', cache: 'no-cache', signal: controller.signal });
+        clearTimeout(id);
+        if (!resp.ok) return false;
+        const ct = resp.headers.get('content-type') || '';
+        return ct.startsWith('image/') || url.toLowerCase().endsWith('.png') || url.toLowerCase().endsWith('.jpg') || url.toLowerCase().endsWith('.svg');
+      } catch (err) {
+        return false;
+      }
+    }
+
+    async function tryLoadImageOrGenerate() {
+      // try each candidate
+      for (const u of uniq) {
+        const ok = await checkUrl(u);
+        if (ok) {
+          if (img) {
+            img.src = u;
+            img.style.display = 'block';
+          }
+          if (canvas) canvas.style.display = 'none';
+          fallbackNote.textContent = '';
+          return;
+        }
+      }
+
+      // none found -> generate QR on canvas
+      if (canvas && typeof QRCode !== 'undefined') {
+        try {
+          await QRCode.toCanvas(canvas, appUrl, { width: 200, margin: 1, color: { dark: '#000000', light: '#ffffff' } });
+          canvas.style.display = 'block';
+          if (img) img.style.display = 'none';
+          fallbackNote.textContent = '';
+          return;
+        } catch (err) {
+          console.error('QR generation failed', err);
+        }
+      }
+
+      // final fallback: show a helpful message
+      if (img) img.style.display = 'none';
+      if (canvas) canvas.style.display = 'none';
+      fallbackNote.textContent = window.location.origin ? ('QR niet beschikbaar op deze server. Probeer ' + window.location.origin + '/assets/qrcode.png') : 'QR niet beschikbaar.';
+    }
+
+    tryLoadImageOrGenerate();
   }
 
   function setupPwaInstall() {
