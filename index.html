@@ -299,6 +299,45 @@
       display: block;
       height: 65vh;
       min-height: 300px;
+      position: relative;
+    }
+    .map-gps-toolbar {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      z-index: 15;
+    }
+    .map-gps-toolbar button {
+      min-width: 150px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      border-radius: 32px;
+      background: rgba(255,255,255,0.95);
+      color: #111;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .map-gps-toolbar button:hover {
+      opacity: 0.95;
+    }
+    .gps-status {
+      font-size: 0.8rem;
+      line-height: 1.3;
+      max-width: 220px;
+      padding: 8px 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.92);
+      color: #111;
+      border: 1px solid rgba(0,0,0,0.08);
+      text-align: right;
+    }
+    #gpsMarker circle {
+      pointer-events: none;
     }
     .festival-map-wrap {
       position: relative;
@@ -554,6 +593,17 @@
   <div id="infoPage" class="page">
     <div class="card info-card">
       <details>
+        <summary><h2 class="section-title" data-i18n="info_general_title">Algemeen & contact</h2></summary>
+        <div class="accordion-body">
+          <p data-i18n="info_general_desc">Het ❤️U Festival is voor (nieuwe) studenten in de regio Utrecht en is een aanvulling op UIT.</p>
+          <p><strong data-i18n="info_address_label">Locatie:</strong> <span data-i18n="info_address_text">Strijkviertel, Utrecht</span></p>
+          <p><strong data-i18n="info_nav_address_label">Navigatieadres:</strong> <span data-i18n="info_nav_address_text">Strijkviertelweg, Utrecht</span></p>
+          <p><strong data-i18n="info_datetime_label">Datum & Openingstijden</strong><br><span data-i18n="info_datetime_text">Zaterdag 5 september 2026 - 12:00 tot 23:00 uur</span></p>
+        </div>
+      </details>
+    </div>
+    <div class="card info-card">
+      <details>
         <summary><h2 class="section-title" data-i18n="access_title">Bereikbaarheid</h2></summary>
         <div class="accordion-body">
           <p><strong data-i18n="info_bike_title">Fiets</strong><br><span data-i18n="info_bike_text">Er is een grote gratis fietsenstalling aanwezig waar je jouw fiets de gehele dag kunt stallen.</span></p>
@@ -611,6 +661,10 @@
   <div id="mapPage" class="page">
     <div class="card map-layout-card">
       <div class="map-with-legend">
+        <div class="map-gps-toolbar">
+          <button type="button" id="locateBtn" data-i18n="gps_button">📍 Lokaliseren</button>
+          <div id="gpsStatus" class="gps-status" aria-live="polite"></div>
+        </div>
         <div class="festival-map-wrap" id="festivalMap">
           <div class="map-viewport" id="mapViewport">
             <div class="map-stage" id="mapStage"></div>
@@ -917,8 +971,8 @@
   // ----- Taalinstellingen (vereenvoudigd voor deze demo) -----
   let currentLang = 'nl';
   const translations = {
-    nl: { nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart", clear_favs: "Wis favorieten", fav_hint: "Klik op het sterretje om een act te favorieten. Je krijgt notificaties 15,10,5 min van tevoren.", stage_label: "Podium", time_label: "Tijd", genre_label: "Genre", notify_btn: "Notificaties inschakelen", map_hint: "Tik op een icoon voor meer informatie.", map_legend_title: "Legenda", map_message_label: "Laat een bericht achter", map_message_send: "Verstuur", map_message_placeholder: "Typ je bericht…", general_title: "❤️U Festival", general_desc: "Voor (nieuwe) studenten in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Zaterdag 5 september 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download de app", install_desc: "Scan de QR-code om de festival-app op je telefoon te openen en te installeren.", install_btn: "Installeer app", install_ios: "iPhone: Open in Safari → Deel → Zet op beginscherm.", install_android: "Android: Open de link → Installeer app (of ⋮ → Toevoegen aan startscherm).", access_title: "Bereikbaarheid", bike_text: "Gratis stalling, hele dag.", car_text: "P+R Papendorp, ticket online of PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Gratis shuttle vanaf Utrecht Centraal.", lockers_text: "Kluisjes voor 3-4 jassen.", med_q: "Medicatie?", med_a: "Toegestaan met doktersverklaring.", reentry_q: "Terrein verlaten?", reentry_a: "Nee, i.v.m. veiligheid.", glu_desc: "GLU-studenten met gouden armbandje: gouden toiletten en snelle bar.", info_general_title: "Algemeen & contact", info_general_desc: "Het ❤️U Festival is voor (nieuwe) studenten in de regio Utrecht en is een aanvulling op UIT.", info_address_label: "Locatie:", info_address_text: "Strijkviertel, Utrecht", info_nav_address_label: "Navigatieadres:", info_nav_address_text: "Strijkviertelweg, Utrecht", info_datetime_label: "Datum & Openingstijden", info_datetime_text: "Zaterdag 5 september 2026 - 12:00 tot 23:00 uur", info_bike_title: "Fiets", info_bike_text: "Er is een grote gratis fietsenstalling aanwezig waar je jouw fiets de gehele dag kunt stallen.", info_car_title: "Auto", info_car_text: "Je kunt een parkingticket aanschaffen. Parkeren kan op P+R Papendorp, volg hiervoor de borden 'P online ticket'. Heb je geen ticket van te voren gekocht? Dan kun je bij de parkeerwachter op locatie een parkeerticket aanschaffen (PIN ONLY). Let wel op: VOL=VOL", info_ov_title: "OV", info_ov_text: "Kom je met het openbaar vervoer naar Lief? Plan dan je trip via 9292.nl.", info_shuttle_title: "Shuttlebus", info_shuttle_text: "Vanaf Utrecht Centraal kun je onze gratis shuttlebus richting het festivalterrein pakken. Je vindt deze bus op het centraal station aan de Mineurslaan. Volg de witte bordjes met zwarte pijlen én ' ❤️U Festival'. De bus rijdt tussen 12:00 uur & 19:00 uur richting het festival en vanaf 21:00 uur kun je weer instappen om richting het station te gaan.", info_taxi_title: "Taxi + Kiss & Ride", info_taxi_text: "Navigeer naar Strijkviertel, De Meern (Utrecht). Volg de borden 'Kiss & Ride ❤️U Festival', zodra je in de buurt bent van het festivalterrein.", lockers_title: "Lockers", info_lockers_text1: "Op het festivalterrein zijn kluisjes aanwezig waar je je spullen veilig kunt opbergen!", info_lockers_text2: "Hier passen 3 à 4 jassen in. Goed om te weten: je kunt je kluisje gedurende de hele dag openen en sluiten zo vaak je wilt.", info_lockers_text3: "Het is niet mogelijk om online een kluisje te reserveren.", faq_title: "FAQ", info_faq_med_q: "Ik gebruik medicatie. Wat nu?", info_faq_med_a: "Het is toegestaan om medicijnen mee te nemen in een dosis die je maximaal nodig hebt op 1 dag. Een doktersverklaring/medicatiepaspoort is noodzakelijk. De beveiliging zal jouw documentatie beoordelen en de medicijnen controleren. Het kan zijn dat de EHBO jouw medicijnen (bijvoorbeeld als deze gevaarlijk zijn i.c.m. alcohol) in bewaring neemt en je deze enkel kan innemen bij de EHBO.", info_faq_reentry_q: "Mag ik het festivalterrein tussentijds verlaten?", info_faq_reentry_a: "Nee, helaas is dat niet mogelijk. Om de veiligheid van alle bezoekers te kunnen waarborgen, kunnen we het niet toestaan dat het festivalterrein tussentijds verlaten wordt. Wij hebben namelijk geen zicht op hetgeen wat een bezoeker buiten het festivalterrein doet en in welke staat deze het terrein weer betreedt. Hier kunnen dan ook geen uitzonderingen voor gemaakt worden. Wij hebben genoeg loungeplekken, foodstands & barren om het een hele dag uit te kunnen houden.", info_faq_lockers_q: "Zijn er lockers?", info_faq_lockers_a: "Yes, deze zijn er! Op het terrein kun je medium & grote lockers huren.", glu_title: "Golden-GLU", info_glu_text1: "Studenten van het GLU hebben tijdens het festival speciale privileges en zijn herkenbaar aan een gouden armbandje.", info_glu_text2: "Met dit gouden armbandje kunnen ze tijdens het festival gebruik maken van de gouden toiletten en met goud gemarkeerde bestelpunten aan de bars zonder in een rij te hoeven staan." },
-    en: { nav_home: "Home", nav_info: "Info", nav_program: "Schedule", nav_map: "Map", clear_favs: "Clear favorites", fav_hint: "Click the star to favorite an act. You'll receive notifications 15,10,5 minutes before.", stage_label: "Stage", time_label: "Time", genre_label: "Genre", notify_btn: "Enable notifications", map_hint: "Tap an icon for more information.", map_legend_title: "Legend", map_message_label: "Leave a message", map_message_send: "Send", map_message_placeholder: "Type your message…", general_title: "❤️U Festival", general_desc: "For (new) students in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Saturday September 5, 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download the app", install_desc: "Scan the QR code to open and install the festival app on your phone.", install_btn: "Install app", install_ios: "iPhone: Open in Safari → Share → Add to Home Screen.", install_android: "Android: Open the link → Install app (or ⋮ → Add to Home screen).", access_title: "Accessibility", bike_text: "Free bicycle parking all day.", car_text: "P+R Papendorp, ticket online or PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Free shuttle from Utrecht Central.", lockers_text: "Lockers for 3-4 coats.", med_q: "Medication?", med_a: "Allowed with doctor's note.", reentry_q: "Leave & re-enter?", reentry_a: "No, for safety.", glu_desc: "GLU students with golden wristband: golden toilets & fast bar.", info_general_title: "General & contact", info_general_desc: "The ❤️U Festival is for (new) students in the Utrecht region and is a supplement to UIT.", info_address_label: "Location:", info_address_text: "Strijkviertel, Utrecht", info_nav_address_label: "Navigation address:", info_nav_address_text: "Strijkviertelweg, Utrecht", info_datetime_label: "Date & opening times", info_datetime_text: "Saturday September 5, 2026 - 12:00 to 23:00", info_bike_title: "Bike", info_bike_text: "There is a large free bike parking area where you can park your bike all day.", info_car_title: "Car", info_car_text: "You can purchase a parking ticket. Parking is available at P+R Papendorp; follow the signs 'P online ticket'. If you have not bought a ticket in advance, you can purchase one from the parking attendant on site (PIN ONLY). Note: WHEN IT'S FULL, IT'S FULL.", info_ov_title: "Public transport", info_ov_text: "If you are coming by public transport to Lief, plan your trip via 9292.nl.", info_shuttle_title: "Shuttle bus", info_shuttle_text: "From Utrecht Central you can take our free shuttle bus to the festival site. You'll find this bus at the central station on Mineurslaan. Follow the white signs with black arrows and '❤️U Festival'. The bus runs between 12:00 and 19:00 toward the festival and from 21:00 you can board again to return to the station.", info_taxi_title: "Taxi + Kiss & Ride", info_taxi_text: "Navigate to Strijkviertel, De Meern (Utrecht). Follow the signs 'Kiss & Ride ❤️U Festival' once you are near the festival site.", lockers_title: "Lockers", info_lockers_text1: "There are lockers on the festival site where you can safely store your belongings!", info_lockers_text2: "They fit 3 to 4 jackets. Good to know: you can open and close your locker as often as you want throughout the day.", info_lockers_text3: "It is not possible to reserve a locker online.", faq_title: "FAQ", info_faq_med_q: "I use medication. What now?", info_faq_med_a: "It is allowed to bring medication in a dose you need for one day. A doctor's statement/medication passport is required. Security will check your documentation and medication. The first aid team may take your medication into safekeeping (for example if it is dangerous with alcohol) and you may only take it under their supervision.", info_faq_reentry_q: "May I leave the festival grounds temporarily?", info_faq_reentry_a: "No, unfortunately that is not possible. For the safety of all visitors, we cannot allow temporary exit from the festival grounds. We do not know what visitors do outside the festival grounds or in what condition they return. No exceptions can be made. We have plenty of lounges, food stands & bars to spend the whole day.", info_faq_lockers_q: "Are there lockers?", info_faq_lockers_a: "Yes, there are! On site you can rent medium & large lockers.", glu_title: "Golden-GLU", info_glu_text1: "GLU students have special privileges at the festival and are recognizable by a golden wristband.", info_glu_text2: "With this golden wristband they can use golden toilets and gold-marked bar order points without waiting in line." }
+    nl: { nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart", clear_favs: "Wis favorieten", fav_hint: "Klik op het sterretje om een act te favorieten. Je krijgt notificaties 15,10,5 min van tevoren.", stage_label: "Podium", time_label: "Tijd", genre_label: "Genre", notify_btn: "Notificaties inschakelen", map_hint: "Tik op een icoon voor meer informatie.", map_legend_title: "Legenda", map_message_label: "Laat een bericht achter", map_message_send: "Verstuur", map_message_placeholder: "Typ je bericht…", general_title: "❤️U Festival", general_desc: "Voor (nieuwe) studenten in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Zaterdag 5 september 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download de app", install_desc: "Scan de QR-code om de festival-app op je telefoon te openen en te installeren.", install_btn: "Installeer app", install_ios: "iPhone: Open in Safari → Deel → Zet op beginscherm.", install_android: "Android: Open de link → Installeer app (of ⋮ → Toevoegen aan startscherm).", access_title: "Bereikbaarheid", bike_text: "Gratis stalling, hele dag.", car_text: "P+R Papendorp, ticket online of PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Gratis shuttle vanaf Utrecht Centraal.", lockers_text: "Kluisjes voor 3-4 jassen.", med_q: "Medicatie?", med_a: "Toegestaan met doktersverklaring.", reentry_q: "Terrein verlaten?", reentry_a: "Nee, i.v.m. veiligheid.", glu_desc: "GLU-studenten met gouden armbandje: gouden toiletten en snelle bar.", gps_button: "📍 Lokaliseren", gps_status_searching: "Locatie zoeken…", gps_status_success: "Je locatie is gevonden.", gps_status_denied: "Geolocation geblokkeerd of niet beschikbaar.", gps_status_error: "Kan locatie niet ophalen.", info_general_title: "Algemeen & contact", info_general_desc: "Het ❤️U Festival is voor (nieuwe) studenten in de regio Utrecht en is een aanvulling op UIT.", info_address_label: "Locatie:", info_address_text: "Strijkviertel, Utrecht", info_nav_address_label: "Navigatieadres:", info_nav_address_text: "Strijkviertelweg, Utrecht", info_datetime_label: "Datum & Openingstijden", info_datetime_text: "Zaterdag 5 september 2026 - 12:00 tot 23:00 uur", info_bike_title: "Fiets", info_bike_text: "Er is een grote gratis fietsenstalling aanwezig waar je jouw fiets de gehele dag kunt stallen.", info_car_title: "Auto", info_car_text: "Je kunt een parkingticket aanschaffen. Parkeren kan op P+R Papendorp, volg hiervoor de borden 'P online ticket'. Heb je geen ticket van te voren gekocht? Dan kun je bij de parkeerwachter op locatie een parkeerticket aanschaffen (PIN ONLY). Let wel op: VOL=VOL", info_ov_title: "OV", info_ov_text: "Kom je met het openbaar vervoer naar Lief? Plan dan je trip via 9292.nl.", info_shuttle_title: "Shuttlebus", info_shuttle_text: "Vanaf Utrecht Centraal kun je onze gratis shuttlebus richting het festivalterrein pakken. Je vindt deze bus op het centraal station aan de Mineurslaan. Volg de witte bordjes met zwarte pijlen én ' ❤️U Festival'. De bus rijdt tussen 12:00 uur & 19:00 uur richting het festival en vanaf 21:00 uur kun je weer instappen om richting het station te gaan.", info_taxi_title: "Taxi + Kiss & Ride", info_taxi_text: "Navigeer naar Strijkviertel, De Meern (Utrecht). Volg de borden 'Kiss & Ride ❤️U Festival', zodra je in de buurt bent van het festivalterrein.", lockers_title: "Lockers", info_lockers_text1: "Op het festivalterrein zijn kluisjes aanwezig waar je je spullen veilig kunt opbergen!", info_lockers_text2: "Hier passen 3 à 4 jassen in. Goed om te weten: je kunt je kluisje gedurende de hele dag openen en sluiten zo vaak je wilt.", info_lockers_text3: "Het is niet mogelijk om online een kluisje te reserveren.", faq_title: "FAQ", info_faq_med_q: "Ik gebruik medicatie. Wat nu?", info_faq_med_a: "Het is toegestaan om medicijnen mee te nemen in een dosis die je maximaal nodig hebt op 1 dag. Een doktersverklaring/medicatiepaspoort is noodzakelijk. De beveiliging zal jouw documentatie beoordelen en de medicijnen controleren. Het kan zijn dat de EHBO jouw medicijnen (bijvoorbeeld als deze gevaarlijk zijn i.c.m. alcohol) in bewaring neemt en je deze enkel kan innemen bij de EHBO.", info_faq_reentry_q: "Mag ik het festivalterrein tussentijds verlaten?", info_faq_reentry_a: "Nee, helaas is dat niet mogelijk. Om de veiligheid van alle bezoekers te kunnen waarborgen, kunnen we het niet toestaan dat het festivalterrein tussentijds verlaten wordt. Wij hebben namelijk geen zicht op hetgeen wat een bezoeker buiten het festivalterrein doet en in welke staat deze het terrein weer betreedt. Hier kunnen dan ook geen uitzonderingen voor gemaakt worden. Wij hebben genoeg loungeplekken, foodstands & barren om het een hele dag uit te kunnen houden.", info_faq_lockers_q: "Zijn er lockers?", info_faq_lockers_a: "Yes, deze zijn er! Op het terrein kun je medium & grote lockers huren.", glu_title: "Golden-GLU", info_glu_text1: "Studenten van het GLU hebben tijdens het festival speciale privileges en zijn herkenbaar aan een gouden armbandje.", info_glu_text2: "Met dit gouden armbandje kunnen ze tijdens het festival gebruik maken van de gouden toiletten en met goud gemarkeerde bestelpunten aan de bars zonder in een rij te hoeven staan." },
+    en: { nav_home: "Home", nav_info: "Info", nav_program: "Schedule", nav_map: "Map", clear_favs: "Clear favorites", fav_hint: "Click the star to favorite an act. You'll receive notifications 15,10,5 minutes before.", stage_label: "Stage", time_label: "Time", genre_label: "Genre", notify_btn: "Enable notifications", map_hint: "Tap an icon for more information.", map_legend_title: "Legend", map_message_label: "Leave a message", map_message_send: "Send", map_message_placeholder: "Type your message…", general_title: "❤️U Festival", general_desc: "For (new) students in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Saturday September 5, 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download the app", install_desc: "Scan the QR code to open and install the festival app on your phone.", install_btn: "Install app", install_ios: "iPhone: Open in Safari → Share → Add to Home Screen.", install_android: "Android: Open the link → Install app (or ⋮ → Add to Home screen).", access_title: "Accessibility", bike_text: "Free bicycle parking all day.", car_text: "P+R Papendorp, ticket online or PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Free shuttle from Utrecht Central.", lockers_text: "Lockers for 3-4 coats.", med_q: "Medication?", med_a: "Allowed with doctor's note.", reentry_q: "Leave & re-enter?", reentry_a: "No, for safety.", glu_desc: "GLU students with golden wristband: golden toilets & fast bar.", gps_button: "📍 Locate me", gps_status_searching: "Searching for location…", gps_status_success: "Your location is found.", gps_status_denied: "Geolocation blocked or unavailable.", gps_status_error: "Cannot retrieve location.", info_general_title: "General & contact", info_general_desc: "The ❤️U Festival is for (new) students in the Utrecht region and is a supplement to UIT.", info_address_label: "Location:", info_address_text: "Strijkviertel, Utrecht", info_nav_address_label: "Navigation address:", info_nav_address_text: "Strijkviertelweg, Utrecht", info_datetime_label: "Date & opening times", info_datetime_text: "Saturday September 5, 2026 - 12:00 to 23:00", info_bike_title: "Bike", info_bike_text: "There is a large free bike parking area where you can park your bike all day.", info_car_title: "Car", info_car_text: "You can purchase a parking ticket. Parking is available at P+R Papendorp; follow the signs 'P online ticket'. If you have not bought a ticket in advance, you can purchase one from the parking attendant on site (PIN ONLY). Note: WHEN IT'S FULL, IT'S FULL.", info_ov_title: "Public transport", info_ov_text: "If you are coming by public transport to Lief, plan your trip via 9292.nl.", info_shuttle_title: "Shuttle bus", info_shuttle_text: "From Utrecht Central you can take our free shuttle bus to the festival site. You'll find this bus at the central station on Mineurslaan. Follow the white signs with black arrows and '❤️U Festival'. The bus runs between 12:00 and 19:00 toward the festival and from 21:00 you can board again to return to the station.", info_taxi_title: "Taxi + Kiss & Ride", info_taxi_text: "Navigate to Strijkviertel, De Meern (Utrecht). Follow the signs 'Kiss & Ride ❤️U Festival' once you are near the festival site.", lockers_title: "Lockers", info_lockers_text1: "There are lockers on the festival site where you can safely store your belongings!", info_lockers_text2: "They fit 3 to 4 jackets. Good to know: you can open and close your locker as often as you want throughout the day.", info_lockers_text3: "It is not possible to reserve a locker online.", faq_title: "FAQ", info_faq_med_q: "I use medication. What now?", info_faq_med_a: "It is allowed to bring medication in a dose you need for one day. A doctor's statement/medication passport is required. Security will check your documentation and medication. The first aid team may take your medication into safekeeping (for example if it is dangerous with alcohol) and you may only take it under their supervision.", info_faq_reentry_q: "May I leave the festival grounds temporarily?", info_faq_reentry_a: "No, unfortunately that is not possible. For the safety of all visitors, we cannot allow temporary exit from the festival grounds. We do not know what visitors do outside the festival grounds or in what condition they return. No exceptions can be made. We have plenty of lounges, food stands & bars to spend the whole day.", info_faq_lockers_q: "Are there lockers?", info_faq_lockers_a: "Yes, there are! On site you can rent medium & large lockers.", glu_title: "Golden-GLU", info_glu_text1: "GLU students have special privileges at the festival and are recognizable by a golden wristband.", info_glu_text2: "With this golden wristband they can use golden toilets and gold-marked bar order points without waiting in line." }
   };
   function applyLanguage() {
     const t = translations[currentLang];
@@ -1141,6 +1195,69 @@
       mapTransform.scale = nextScale;
       applyMapTransform();
     }, { passive: false });
+  }
+
+  function updateGpsStatus(message) {
+    const statusEl = document.getElementById("gpsStatus");
+    if (statusEl) statusEl.innerText = message;
+  }
+
+  function handleLocationSuccess(position) {
+    const { latitude, longitude, accuracy } = position.coords;
+    const message = `${translations[currentLang].gps_status_success} ${latitude.toFixed(5)}, ${longitude.toFixed(5)} (${Math.round(accuracy)}m)`;
+    updateGpsStatus(message);
+    showGpsMarker();
+  }
+
+  function handleLocationError(error) {
+    const t = translations[currentLang];
+    let message = t.gps_status_error;
+    if (error.code === 1) {
+      message = t.gps_status_denied;
+    } else if (error.code === 2) {
+      message = currentLang === "nl" ? "Locatie niet gevonden." : "Location not found.";
+    } else if (error.code === 3) {
+      message = currentLang === "nl" ? "Locatie-aanvraag verlopen." : "Location request timed out.";
+    }
+    updateGpsStatus(message);
+    const marker = document.querySelector("#mapStage svg #gpsMarker");
+    if (marker) marker.setAttribute("display", "none");
+  }
+
+  function ensureGpsMarker(svg) {
+    let marker = svg.querySelector("#gpsMarker");
+    if (marker) return marker;
+    marker = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    marker.id = "gpsMarker";
+    marker.setAttribute("pointer-events", "none");
+    marker.setAttribute("display", "none");
+    marker.innerHTML = '<circle cx="0" cy="0" r="18" fill="#ff4d4d" opacity="0.95" /><circle cx="0" cy="0" r="30" fill="none" stroke="#ff4d4d" stroke-width="4" opacity="0.5" />';
+    svg.appendChild(marker);
+    return marker;
+  }
+
+  function showGpsMarker() {
+    const svg = document.querySelector("#mapStage svg");
+    if (!svg) return;
+    const marker = ensureGpsMarker(svg);
+    const x = MAP_VIEWBOX.width * 0.54;
+    const y = MAP_VIEWBOX.height * 0.55;
+    marker.setAttribute("transform", `translate(${x}, ${y})`);
+    marker.setAttribute("display", "inline");
+  }
+
+  function initGpsLocation() {
+    const t = translations[currentLang];
+    if (!navigator.geolocation) {
+      updateGpsStatus(currentLang === "nl" ? "Geolocation niet ondersteund." : "Geolocation not supported.");
+      return;
+    }
+    updateGpsStatus(t.gps_status_searching);
+    navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationError, {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0,
+    });
   }
 
   async function initFestivalMap() {
@@ -1443,6 +1560,8 @@
       document.getElementById('actModal').classList.remove('open');
       document.getElementById('modalOverlay').classList.remove('open');
     });
+    const locateBtn = document.getElementById('locateBtn');
+    if (locateBtn) locateBtn.addEventListener('click', initGpsLocation);
     setupNotificationTest();
     setupInstallQr();
     setupPwaInstall();
