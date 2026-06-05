@@ -145,6 +145,51 @@
       border: 1px solid var(--border-light);
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
+    .artist-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-top: 12px;
+    }
+    .artist-card {
+      background: var(--bg-light);
+      border: 1px solid var(--border-light);
+      border-radius: 22px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 260px;
+    }
+    .artist-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    body.dark .artist-card {
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+    }
+    .artist-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--secondary);
+    }
+    .artist-card p {
+      margin: 0;
+      line-height: 1.5;
+      flex: 1;
+    }
+    .artist-card a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .artist-card a:hover {
+      text-decoration: underline;
+    }
     /* Accordion (info page) */
     .info-card details {
       background: transparent;
@@ -183,6 +228,9 @@
       border-radius: 20px;
       border: 1px solid var(--border-light);
       background: var(--card-light);
+    }
+    .schedule-section {
+      margin-bottom: 24px;
     }
     .schedule-grid {
       display: grid;
@@ -587,6 +635,77 @@
         </div>
       </div>
     </div>
+    <div class="card">
+      <h3 class="section-title">Artiesten</h3>
+      <div class="artist-grid">
+        <div class="artist-card">
+          <img src="assets/acts/armin.png" alt="Armin van Buuren">
+          <h3>Armin van Buuren</h3>
+          <p>Five-time “World’s No. 1 DJ” and trance icon, Armin delivers euphoric, high-energy sets that have headlined festivals from Tomorrowland to Ultra.</p>
+          <a href="https://www.youtube.com/watch?v=TxvpctgU_s8" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/martin.png" alt="Martin Garrix">
+          <h3>Martin Garrix</h3>
+          <p>Broke through as a teenager with “Animals,” Martin Garrix has become one of the biggest names in EDM with anthem-ready drops and stadium energy.</p>
+          <a href="https://www.youtube.com/watch?v=Zv1QV6lrc_Y" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/kensington.png" alt="Kensington">
+          <h3>Kensington</h3>
+          <p>Rotterdam-born indie rock quintet known for soaring choruses and driving guitar riffs, with arena-ready hooks and emotionally charged lyricism.</p>
+          <a href="https://www.youtube.com/watch?v=IH77eOyV95o" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/within.png" alt="Within Temptation">
+          <h3>Within Temptation</h3>
+          <p>Symphonic metal pioneers fronted by Sharon den Adel, delivering cinematic soundscapes and operatic vocals for dramatic festival performances.</p>
+          <a href="https://www.youtube.com/watch?v=iQVei5C2N4E" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/staat.png" alt="De Staat">
+          <h3>De Staat</h3>
+          <p>Experimental rock outfit blending funky grooves with angular guitar work and theatrical stagecraft, known for genre-bending live energy.</p>
+          <a href="https://www.youtube.com/watch?v=0ttGgIQpAUc" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/chef.png" alt="Chef’Special">
+          <h3>Chef’Special</h3>
+          <p>A Haarlem four-piece mixing funk, pop, rock and hip-hop, creating upbeat, genre-fluid songs that make for joyous live festival shows.</p>
+          <a href="https://www.youtube.com/watch?v=l3jRIr44lss" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/navarone.png" alt="Navarone">
+          <h3>Navarone</h3>
+          <p>Utrecht’s hard-hitting rock four-piece, delivering riff-driven anthems and raw intensity suited to late-night main stage slots.</p>
+          <a href="https://www.youtube.com/watch?v=EvLpaCSnc4k" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/dotan.png" alt="Dotan">
+          <h3>Dotan</h3>
+          <p>Folk-pop singer-songwriter whose intimate voice and acoustic arrangements connect deeply, especially with heartfelt songs like “Home.”</p>
+          <a href="https://www.youtube.com/watch?v=FZEuqzW16Nw" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/eefje.png" alt="Eefje de Visser">
+          <h3>Eefje de Visser</h3>
+          <p>Indie-pop artist creating atmospheric, electronic-tinged songs with hypnotic vocals and lush production, perfect for twilight festival moments.</p>
+          <a href="https://www.youtube.com/watch?v=6IlLJNmLDMg" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/froukje.png" alt="Froukje">
+          <h3>Froukje</h3>
+          <p>Breakthrough pop songwriter combining candid lyrics with catchy synth-driven hooks, quickly becoming a voice of her generation.</p>
+          <a href="https://www.youtube.com/watch?v=g4PlReX9e-E" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+        <div class="artist-card">
+          <img src="assets/acts/spinvis.png" alt="Spinvis">
+          <h3>Spinvis</h3>
+          <p>Poetic lo-fi surrealist in pop form, blending spoken-word snippets with wistful melodies for intimate, dreamlike live experiences.</p>
+          <a href="https://www.youtube.com/watch?v=F3ZTrGWSLf4" target="_blank" rel="noreferrer">Bekijk video</a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- INFO page (festivalinformatie) -->
@@ -652,7 +771,14 @@
         <h2 class="section-title">📅 Blokkenschema - Zaterdag</h2>
         <button id="clearFavsBtn" class="tool-btn" style="background: #555;"><i class="fas fa-trash"></i> <span data-i18n="clear_favs">Wis favorieten</span></button>
       </div>
-      <div class="schedule-wrapper" id="scheduleGrid"></div>
+      <div class="schedule-section">
+        <h3 class="section-title" style="margin-bottom: 12px;">Zaterdag</h3>
+        <div class="schedule-wrapper" id="scheduleGridSat"></div>
+      </div>
+      <div class="schedule-section">
+        <h3 class="section-title" style="margin-bottom: 12px;">Zondag</h3>
+        <div class="schedule-wrapper" id="scheduleGridSun"></div>
+      </div>
       <p style="font-size:0.7rem; margin-top:8px;"><i class="fas fa-star"></i> <span data-i18n="fav_hint">Klik op het sterretje om een act te favorieten. Je krijgt dan notificaties 15,10,5 min van tevoren.</span></p>
     </div>
   </div>
@@ -726,55 +852,230 @@
   // Podia: exact 4 zoals in de opdracht
   const stages = ["Poton", "The Lake", "The Club", "Hanggar"];
   
-  // Tijdsloten van 10:00 tot 02:00 (volgende dag) in stappen van 30 minuten (overzichtelijk)
-  // We gebruiken 30-min slots, maar je kunt eenvoudig 15-min slots toevoegen.
-  const timeSlots = [];
-  for (let hour = 10; hour <= 26; hour++) {
-    let h = hour % 24;
-    let hourStr = h.toString().padStart(2,'0');
-    timeSlots.push(`${hourStr}:00 - ${hourStr}:30`);
-    if (hour < 26) timeSlots.push(`${hourStr}:30 - ${(h+1).toString().padStart(2,'0')}:00`);
-  }
-  // Verwijder laatste dubbele 26:30?
-  // Maar we nemen eerste 20 slots voor demo, je kunt later aanvullen.
-  // In het echte schema zijn er meer slots. Voor de leesbaarheid gebruiken we 10:00 t/m 02:00 met 30-min intervallen.
-  // We filteren tot 02:00 (26:00),
-  const filteredSlots = timeSlots.filter((_, idx) => idx < 34); // tot ~02:00
   
   // Artist database (informatie per act)
   const artistsDb = {
-    "Spinvis": { genre: "Lo-fi / Indie", nl: "Eenmansband van Erik de Jong, magische lo-fi.", en: "One-man band by Erik de Jong, magical lo-fi." },
-    "Stand-up Collective": { genre: "Comedy", nl: "Hilarische comedians met scherpe grappen.", en: "Hilarious stand-up comedians." },
-    "DJ set 1": { genre: "Electronic", nl: "Energizing house & techno set.", en: "Energizing house & techno set." },
-    "The Luminals": { genre: "Indie Rock", nl: "Aanstekelijke indie rock melodieën.", en: "Catchy indie rock melodies." },
-    "Bass Horizon": { genre: "Bass", nl: "Dubstep & future bass.", en: "Dubstep & future bass." },
-    "Neon Dreams": { genre: "Synthwave", nl: "Retro elektronische sound.", en: "Retro electronic sound." },
-    "Velvet Code": { genre: "Techno", nl: "Donkere techno beats.", en: "Dark techno beats." },
-    "Solar Harmonics": { genre: "House", nl: "Deep house journey.", en: "Deep house journey." }
+    "Armin van Buuren": {
+      genre: "Trance",
+      nl: "Trance icoon met euforische sets en dikke melodieën.",
+      en: "Trance icon with euphoric sets and big melodies.",
+      video: "https://www.youtube.com/watch?v=TxvpctgU_s8"
+    },
+    "Martin Garrix": {
+      genre: "EDM",
+      nl: "EDM-superster met anthemische drops en festivaloverwinningen.",
+      en: "EDM superstar with anthemic drops and festival domination.",
+      video: "https://www.youtube.com/watch?v=Zv1QV6lrc_Y"
+    },
+    "Kensington": {
+      genre: "Indie Rock",
+      nl: "Rotterdamse indie-rockband met grootse refreinen en emotie.",
+      en: "Rotterdam indie rock band with soaring choruses and emotion.",
+      video: "https://www.youtube.com/watch?v=IH77eOyV95o"
+    },
+    "Within Temptation": {
+      genre: "Symphonic Metal",
+      nl: "Symfonische metalpioniers met cinematische shows en operazang.",
+      en: "Symphonic metal pioneers with cinematic shows and operatic vocals.",
+      video: "https://www.youtube.com/watch?v=iQVei5C2N4E"
+    },
+    "De Staat": {
+      genre: "Experimental Rock",
+      nl: "Experimentele rock met funky grooves en theatrale podiumkunst.",
+      en: "Experimental rock with funky grooves and theatrical stagecraft.",
+      video: "https://www.youtube.com/watch?v=0ttGgIQpAUc"
+    },
+    "Chef’Special": {
+      genre: "Funk Pop",
+      nl: "Genre-vermengende funk-pop met een vrolijke live sfeer.",
+      en: "Genre-blending funk-pop with joyful live energy.",
+      video: "https://www.youtube.com/watch?v=l3jRIr44lss"
+    },
+    "Navarone": {
+      genre: "Rock",
+      nl: "Hard-hitsende rockband uit Utrecht met rauwe live energie.",
+      en: "Hard-hitting rock four-piece from Utrecht with raw live energy.",
+      video: "https://www.youtube.com/watch?v=EvLpaCSnc4k"
+    },
+    "Dotan": {
+      genre: "Folk Pop",
+      nl: "Folk-pop singer-songwriter met intieme verhalen en subtiele arrangementen.",
+      en: "Folk-pop singer-songwriter with intimate storytelling and subtle arrangements.",
+      video: "https://www.youtube.com/watch?v=FZEuqzW16Nw"
+    },
+    "Eefje de Visser": {
+      genre: "Indie Pop",
+      nl: "Sfeervolle indie-pop met elektronische accenten en hypnotiserende zang.",
+      en: "Atmospheric indie pop with electronic touches and hypnotic vocals.",
+      video: "https://www.youtube.com/watch?v=6IlLJNmLDMg"
+    },
+    "Froukje": {
+      genre: "Pop",
+      nl: "Openhartige popsongwriter met aanstekelijke synthhooks.",
+      en: "Candid pop songwriter with catchy synth-driven hooks.",
+      video: "https://www.youtube.com/watch?v=g4PlReX9e-E"
+    },
+    "Spinvis": {
+      genre: "Lo-fi / Indie",
+      nl: "Poëtische lo-fi surrealist met collageachtige popliedjes.",
+      en: "Poetic lo-fi surrealist blending spoken-word and wistful pop.",
+      video: "https://www.youtube.com/watch?v=F3ZTrGWSLf4"
+    }
   };
   
   // Het rooster: mapping van (stage, timeSlot) => artist name (of null)
-  // Dit is een voorbeeld dat makkelijk aanpasbaar is. Je vult hier de echte programmering in.
-  // We genereren een realistisch patroon gebaseerd op de eerdere line-up.
-  const scheduleData = {};
-  stages.forEach(stage => { scheduleData[stage] = {}; });
+  const timeSlots = [];
+  for (let minutes = 10 * 60; minutes <= 23 * 60 + 45; minutes += 15) {
+    const startHour = Math.floor(minutes / 60).toString().padStart(2, '0');
+    const startMinute = (minutes % 60).toString().padStart(2, '0');
+    const endMinutes = minutes + 15;
+    const endHour = Math.floor(endMinutes / 60).toString().padStart(2, '0');
+    const endMinute = (endMinutes % 60).toString().padStart(2, '0');
+    timeSlots.push(`${startHour}:${startMinute} - ${endHour}:${endMinute}`);
+  }
   
-  // Vul het rooster (fictief maar gelijkend op het plaatje)
-  // Voor de demo zorgen we dat elk tijdslot een artiest heeft.
-  const artistsList = ["Spinvis", "Stand-up Collective", "DJ set 1", "The Luminals", "Bass Horizon", "Neon Dreams", "Velvet Code", "Solar Harmonics"];
-  filteredSlots.forEach((slot, idx) => {
+  function parseMinutes(timeStr) {
+    const [hour, minute] = timeStr.split(':').map(Number);
+    return hour * 60 + minute;
+  }
+  
+  function createEmptySchedule() {
+    const schedule = {};
     stages.forEach(stage => {
-      let artist = artistsList[(idx + stages.indexOf(stage)) % artistsList.length];
-      // variatie: sommige slots leeg (rust)
-      if (idx % 5 === 2 && stage !== "Poton") artist = null;
-      scheduleData[stage][slot] = artist;
+      schedule[stage] = {};
+      timeSlots.forEach(slot => {
+        schedule[stage][slot] = null;
+      });
     });
-  });
-  // Zorg voor een paar specifieke acts
-  scheduleData["Poton"]["12:00 - 12:30"] = "Spinvis";
-  scheduleData["The Lake"]["14:00 - 14:30"] = "Stand-up Collective";
-  scheduleData["The Club"]["18:00 - 18:30"] = "DJ set 1";
-  scheduleData["Hanggar"]["20:00 - 20:30"] = "The Luminals";
+    return schedule;
+  }
+  
+  function fillSchedule(schedule, events) {
+    events.forEach(event => {
+      const start = parseMinutes(event.start);
+      const end = parseMinutes(event.end);
+      timeSlots.forEach(slot => {
+        const slotStart = parseMinutes(slot.split(' - ')[0]);
+        if (slotStart >= start && slotStart < end) {
+          schedule[event.stage][slot] = event.name;
+        }
+      });
+    });
+  }
+  
+  const saturdayEvents = [
+    { stage: 'Poton', name: 'Armin van Buuren', start: '10:15', end: '12:15' },
+    { stage: 'Poton', name: 'Kensington', start: '12:45', end: '14:15' },
+    { stage: 'Poton', name: 'De Staat', start: '15:15', end: '16:45' },
+    { stage: 'Poton', name: 'Navarone', start: '17:15', end: '18:45' },
+    { stage: 'Poton', name: 'Dotan', start: '19:15', end: '20:45' },
+    { stage: 'Poton', name: 'Froukje', start: '21:15', end: '23:15' },
+    { stage: 'The Lake', name: 'Talent set 1', start: '10:00', end: '10:45' },
+    { stage: 'The Lake', name: 'Talent set 2', start: '11:15', end: '12:00' },
+    { stage: 'The Lake', name: 'Talent set 3', start: '13:00', end: '14:00' },
+    { stage: 'The Lake', name: 'Talent set 4', start: '14:30', end: '15:30' },
+    { stage: 'The Lake', name: 'Talent set 5', start: '16:00', end: '17:00' },
+    { stage: 'The Lake', name: 'Talent set 6', start: '18:00', end: '19:00' },
+    { stage: 'The Lake', name: 'Talent set 7', start: '20:15', end: '21:15' },
+    { stage: 'The Club', name: 'Comedy', start: '12:30', end: '13:30' },
+    { stage: 'The Club', name: 'Lecture', start: '14:00', end: '14:45' },
+    { stage: 'The Club', name: 'Theater', start: '15:30', end: '17:00' },
+    { stage: 'The Club', name: 'Movie', start: '17:30', end: '18:15' },
+    { stage: 'The Club', name: 'Performance', start: '19:00', end: '20:15' },
+    { stage: 'The Club', name: 'Illusionist', start: '20:45', end: '22:00' },
+    { stage: 'Hanggar', name: 'DJ set 1', start: '10:00', end: '11:15' },
+    { stage: 'Hanggar', name: 'DJ set 2', start: '11:15', end: '12:30' },
+    { stage: 'Hanggar', name: 'DJ set 3', start: '12:30', end: '14:00' },
+    { stage: 'Hanggar', name: 'DJ set 4', start: '14:00', end: '15:30' },
+    { stage: 'Hanggar', name: 'DJ set 5', start: '15:30', end: '17:00' },
+    { stage: 'Hanggar', name: 'DJ set 6', start: '17:00', end: '18:30' },
+    { stage: 'Hanggar', name: 'DJ set 7', start: '18:30', end: '20:00' },
+    { stage: 'Hanggar', name: 'DJ set 8', start: '20:00', end: '22:00' }
+  ];
+  
+  const sundayEvents = [
+    { stage: 'Poton', name: 'Martin Garrix', start: '10:45', end: '12:30' },
+    { stage: 'Poton', name: 'Within Temptation', start: '13:30', end: '15:15' },
+    { stage: 'Poton', name: 'Chef’Special', start: '17:00', end: '18:30' },
+    { stage: 'Poton', name: 'Eefje de Visser', start: '18:45', end: '20:30' },
+    { stage: 'Poton', name: 'Spinvis', start: '21:15', end: '23:00' },
+    { stage: 'The Lake', name: 'Talent set 1', start: '10:00', end: '10:45' },
+    { stage: 'The Lake', name: 'Talent set 2', start: '11:15', end: '12:00' },
+    { stage: 'The Lake', name: 'Talent set 3', start: '13:00', end: '14:00' },
+    { stage: 'The Lake', name: 'Talent set 4', start: '14:30', end: '15:30' },
+    { stage: 'The Lake', name: 'Talent set 5', start: '16:00', end: '17:00' },
+    { stage: 'The Lake', name: 'Talent set 6', start: '18:00', end: '19:00' },
+    { stage: 'The Club', name: 'Comedy', start: '12:30', end: '13:30' },
+    { stage: 'The Club', name: 'Lecture', start: '14:00', end: '14:45' },
+    { stage: 'The Club', name: 'Theater', start: '15:30', end: '17:00' },
+    { stage: 'The Club', name: 'Movie', start: '17:30', end: '18:15' },
+    { stage: 'The Club', name: 'Magic Show', start: '19:00', end: '20:30' },
+    { stage: 'Hanggar', name: 'DJ set 1', start: '10:00', end: '11:15' },
+    { stage: 'Hanggar', name: 'DJ set 2', start: '11:15', end: '12:30' },
+    { stage: 'Hanggar', name: 'DJ set 3', start: '12:30', end: '14:00' },
+    { stage: 'Hanggar', name: 'DJ set 4', start: '14:00', end: '15:30' },
+    { stage: 'Hanggar', name: 'DJ set 5', start: '15:30', end: '17:00' },
+    { stage: 'Hanggar', name: 'DJ set 6', start: '17:00', end: '18:30' },
+    { stage: 'Hanggar', name: 'DJ set 7', start: '18:30', end: '20:00' },
+    { stage: 'Hanggar', name: 'DJ set 8', start: '20:00', end: '22:00' }
+  ];
+  
+  const saturdaySchedule = createEmptySchedule();
+  const sundaySchedule = createEmptySchedule();
+  fillSchedule(saturdaySchedule, saturdayEvents);
+  fillSchedule(sundaySchedule, sundayEvents);
+  const scheduleData = saturdaySchedule;
+  
+  function renderScheduleGrid(containerId, scheduleData) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    let html = `<div class="schedule-grid">`;
+    html += `<div class="grid-header time-header">Tijd</div>`;
+    stages.forEach(stage => {
+      html += `<div class="grid-header">${stage}</div>`;
+    });
+    timeSlots.forEach(slot => {
+      html += `<div class="grid-cell time-slot">${slot}</div>`;
+      stages.forEach(stage => {
+        const artist = scheduleData[stage][slot];
+        const hasFav = artist ? favorites.has(`${stage}|${slot}|${artist}`) : false;
+        if (artist) {
+          html += `<div class="grid-cell act-cell" data-stage="${stage}" data-timeslot="${slot}" data-artist="${artist}">
+                    <div class="act-name">${artist}</div>
+                    <div class="act-genre">${artistsDb[artist]?.genre || "Event"}</div>
+                    <i class="fa${hasFav ? 's' : 'r'} fa-star favorite-star" data-stage="${stage}" data-timeslot="${slot}" data-artist="${artist}"></i>
+                   </div>`;
+        } else {
+          html += `<div class="grid-cell" style="background: rgba(0,0,0,0.05);">—</div>`;
+        }
+      });
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+    document.querySelectorAll(`#${containerId} .favorite-star`).forEach(star => {
+      star.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const stage = star.getAttribute('data-stage');
+        const timeslot = star.getAttribute('data-timeslot');
+        const artist = star.getAttribute('data-artist');
+        toggleFavorite(stage, timeslot, artist);
+      });
+    });
+    document.querySelectorAll(`#${containerId} .act-cell`).forEach(cell => {
+      cell.addEventListener('click', (e) => {
+        if (e.target.classList.contains('favorite-star')) return;
+        const stage = cell.getAttribute('data-stage');
+        const timeslot = cell.getAttribute('data-timeslot');
+        const artist = cell.getAttribute('data-artist');
+        if (artist) showActDetails(artist, stage, timeslot);
+      });
+    });
+  }
+  
+  function renderSchedule() {
+    renderScheduleGrid('scheduleGridSat', saturdaySchedule);
+    renderScheduleGrid('scheduleGridSun', sundaySchedule);
+  }
   
   // Favorieten opslag: set van "stage|timeSlot|artist"
   let favorites = new Set();
@@ -859,57 +1160,6 @@
   }
   
 
-  // Render het blokkenschema (grid)
-  function renderSchedule() {
-    const container = document.getElementById("scheduleGrid");
-    if (!container) return;
-    // Bouw grid met CSS Grid
-    let html = `<div class="schedule-grid">`;
-    // Header rij: leeg hoekje + podia
-    html += `<div class="grid-header time-header">Tijd</div>`;
-    stages.forEach(stage => {
-      html += `<div class="grid-header">${stage}</div>`;
-    });
-    // Tijdsloten rijen
-    filteredSlots.forEach(slot => {
-      html += `<div class="grid-cell time-slot">${slot}</div>`;
-      stages.forEach(stage => {
-        const artist = scheduleData[stage][slot];
-        const hasFav = artist ? favorites.has(`${stage}|${slot}|${artist}`) : false;
-        if (artist) {
-          html += `<div class="grid-cell act-cell" data-stage="${stage}" data-timeslot="${slot}" data-artist="${artist}">
-                    <div class="act-name">${artist}</div>
-                    <div class="act-genre">${artistsDb[artist]?.genre || "Band"}</div>
-                    <i class="fa${hasFav ? 's' : 'r'} fa-star favorite-star" data-stage="${stage}" data-timeslot="${slot}" data-artist="${artist}"></i>
-                   </div>`;
-        } else {
-          html += `<div class="grid-cell" style="background: rgba(0,0,0,0.05);">—</div>`;
-        }
-      });
-    });
-    html += `</div>`;
-    container.innerHTML = html;
-    
-    // Event listeners voor sterretjes en cellen
-    document.querySelectorAll('.favorite-star').forEach(star => {
-      star.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const stage = star.getAttribute('data-stage');
-        const timeslot = star.getAttribute('data-timeslot');
-        const artist = star.getAttribute('data-artist');
-        toggleFavorite(stage, timeslot, artist);
-      });
-    });
-    document.querySelectorAll('.act-cell').forEach(cell => {
-      cell.addEventListener('click', (e) => {
-        if (e.target.classList.contains('favorite-star')) return;
-        const stage = cell.getAttribute('data-stage');
-        const timeslot = cell.getAttribute('data-timeslot');
-        const artist = cell.getAttribute('data-artist');
-        if (artist) showActDetails(artist, stage, timeslot);
-      });
-    });
-  }
   
   let currentModalArtist = null;
   function showActDetails(artist, stage, timeSlot) {
@@ -919,7 +1169,7 @@
     document.getElementById("modalStage").innerText = stage;
     document.getElementById("modalTime").innerText = timeSlot;
     document.getElementById("modalGenre").innerText = info.genre;
-    document.getElementById("modalDesc").innerHTML = desc;
+    document.getElementById("modalDesc").innerHTML = desc + (info.video ? `<p style="margin-top:12px;"><a href="${info.video}" target="_blank" rel="noreferrer">Bekijk video</a></p>` : "");
     currentModalArtist = { artist, stage, timeSlot };
     const key = `${stage}|${timeSlot}|${artist}`;
     const isFav = favorites.has(key);
@@ -1307,7 +1557,7 @@
     let nextAct = null;
     let nextSlot = null;
 
-    filteredSlots.forEach((slot) => {
+    timeSlots.forEach((slot) => {
       const artist = scheduleData[stageName]?.[slot];
       if (!artist) return;
       const [startStr, endStr] = slot.split(" - ");
