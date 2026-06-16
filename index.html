@@ -229,73 +229,100 @@
       border: 1px solid var(--border-light);
       background: var(--card-light);
     }
+    body.dark .schedule-wrapper {
+      background: var(--card-dark);
+      border-color: var(--border-dark);
+    }
     .schedule-section {
       margin-bottom: 24px;
     }
-    .schedule-grid {
-      display: grid;
-      grid-template-columns: 100px repeat(4, minmax(180px, 1fr));
-      min-width: 800px;
+    .schedule-table {
+      width: 100%;
+      min-width: 1100px;
+      border-collapse: collapse;
+      table-layout: fixed;
     }
-    .grid-header, .grid-cell {
-      border-bottom: 1px solid var(--border-light);
-      border-right: 1px solid var(--border-light);
-      padding: 12px 8px;
+    .schedule-table th,
+    .schedule-table td {
+      border: 1px solid var(--border-light);
+      padding: 12px 10px;
+      vertical-align: middle;
       text-align: center;
-      font-weight: 400;
+      font-size: 0.95rem;
+      color: var(--text-light);
     }
-    .grid-header {
-      background: var(--secondary);
-      color: white;
-      font-weight: 700;
+    body.dark .schedule-table th,
+    body.dark .schedule-table td {
+      border-color: var(--border-dark);
+    }
+    .schedule-table th {
       position: sticky;
       top: 0;
-      z-index: 2;
-    }
-    .time-header {
       background: var(--secondary);
       color: white;
-      font-weight: 700;
-      position: sticky;
       z-index: 3;
+      font-weight: 700;
+      letter-spacing: 0.02em;
     }
-    .time-slot {
-      background: var(--card-light);
-      font-weight: 600;
+    .schedule-table th:first-child,
+    .schedule-table td.stage-cell {
       position: sticky;
-      background: var(--bg-light);
+      left: 0;
+      z-index: 4;
+      background: var(--card-light);
+      font-weight: 700;
+      text-align: left;
+      min-width: 140px;
     }
-    body.dark .time-slot {
-      background: var(--bg-dark);
+    body.dark .schedule-table th:first-child,
+    body.dark .schedule-table td.stage-cell {
+      background: var(--card-dark);
+      color: var(--text-dark);
     }
-    .act-cell {
+    .schedule-table td.empty-slot {
+      background: rgba(0,0,0,0.05);
+      color: rgba(0,0,0,0.35);
+    }
+    body.dark .schedule-table td.empty-slot {
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.55);
+    }
+    .schedule-table td.act-block {
+      background: rgba(240,50,40,0.15);
       cursor: pointer;
-      transition: 0.1s;
       position: relative;
+      min-width: 120px;
+      transition: background 0.2s, color 0.2s;
+      color: inherit;
     }
-    .act-cell:hover {
-      background: var(--info-saffron);
-      color: black;
+    body.dark .schedule-table td.act-block {
+      background: rgba(240,50,40,0.24);
     }
-    .favorite-star {
+    .schedule-table td.act-block:hover {
+      background: rgba(240,50,40,0.28);
+      color: var(--text-light);
+    }
+    .schedule-table td.act-block .act-name {
+      margin-bottom: 6px;
+      font-weight: 700;
+      font-size: 0.97rem;
+    }
+    .schedule-table td.act-block .act-genre {
+      display: block;
+      font-size: 0.78rem;
+      opacity: 0.85;
+    }
+    .schedule-table td.act-block .favorite-star {
       position: absolute;
-      top: 4px;
-      right: 8px;
+      top: 8px;
+      right: 10px;
       color: gold;
       font-size: 1rem;
       cursor: pointer;
       z-index: 5;
     }
-    .favorite-star:hover {
+    .schedule-table td.act-block .favorite-star:hover {
       transform: scale(1.1);
-    }
-    .act-name {
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .act-genre {
-      font-size: 0.7rem;
-      opacity: 0.8;
     }
 
     /* modal voor act details */
@@ -768,15 +795,15 @@
   <div id="programPage" class="page">
     <div class="card">
       <div class="flex-between">
-        <h2 class="section-title">📅 Blokkenschema - Zaterdag</h2>
+        <h2 class="section-title" data-i18n="schedule_title">📅 Blokkenschema</h2>
         <button id="clearFavsBtn" class="tool-btn" style="background: #555;"><i class="fas fa-trash"></i> <span data-i18n="clear_favs">Wis favorieten</span></button>
       </div>
       <div class="schedule-section">
-        <h3 class="section-title" style="margin-bottom: 12px;">Zaterdag</h3>
+        <h3 class="section-title" style="margin-bottom: 12px;" data-i18n="schedule_day_saturday">Zaterdag</h3>
         <div class="schedule-wrapper" id="scheduleGridSat"></div>
       </div>
       <div class="schedule-section">
-        <h3 class="section-title" style="margin-bottom: 12px;">Zondag</h3>
+        <h3 class="section-title" style="margin-bottom: 12px;" data-i18n="schedule_day_sunday">Zondag</h3>
         <div class="schedule-wrapper" id="scheduleGridSun"></div>
       </div>
       <p style="font-size:0.7rem; margin-top:8px;"><i class="fas fa-star"></i> <span data-i18n="fav_hint">Klik op het sterretje om een act te favorieten. Je krijgt dan notificaties 15,10,5 min van tevoren.</span></p>
@@ -933,6 +960,14 @@
     const endMinute = (endMinutes % 60).toString().padStart(2, '0');
     timeSlots.push(`${startHour}:${startMinute} - ${endHour}:${endMinute}`);
   }
+
+  function getActiveFestivalSchedule() {
+    const now = new Date();
+    if (now.getFullYear() === 2026 && now.getMonth() === 8 && now.getDate() === 6) {
+      return sundaySchedule;
+    }
+    return saturdaySchedule;
+  }
   
   function parseMinutes(timeStr) {
     const [hour, minute] = timeStr.split(':').map(Number);
@@ -1024,33 +1059,57 @@
   const sundaySchedule = createEmptySchedule();
   fillSchedule(saturdaySchedule, saturdayEvents);
   fillSchedule(sundaySchedule, sundayEvents);
-  const scheduleData = saturdaySchedule;
   
   function renderScheduleGrid(containerId, scheduleData) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    let html = `<div class="schedule-grid">`;
-    html += `<div class="grid-header time-header">Tijd</div>`;
-    stages.forEach(stage => {
-      html += `<div class="grid-header">${stage}</div>`;
-    });
+    const hourHeaders = [];
     timeSlots.forEach(slot => {
-      html += `<div class="grid-cell time-slot">${slot}</div>`;
-      stages.forEach(stage => {
-        const artist = scheduleData[stage][slot];
-        const hasFav = artist ? favorites.has(`${stage}|${slot}|${artist}`) : false;
-        if (artist) {
-          html += `<div class="grid-cell act-cell" data-stage="${stage}" data-timeslot="${slot}" data-artist="${artist}">
-                    <div class="act-name">${artist}</div>
-                    <div class="act-genre">${artistsDb[artist]?.genre || "Event"}</div>
-                    <i class="fa${hasFav ? 's' : 'r'} fa-star favorite-star" data-stage="${stage}" data-timeslot="${slot}" data-artist="${artist}"></i>
-                   </div>`;
-        } else {
-          html += `<div class="grid-cell" style="background: rgba(0,0,0,0.05);">—</div>`;
-        }
-      });
+      const [start] = slot.split(' - ');
+      const [hour, minute] = start.split(':').map(Number);
+      if (minute === 0) {
+        hourHeaders.push(`${hour.toString().padStart(2, '0')}:00`);
+      }
     });
-    html += `</div>`;
+    let html = `<table class="schedule-table"><thead><tr><th data-i18n="time_label">Tijd</th>`;
+    hourHeaders.forEach(label => {
+      html += `<th colspan="4">${label}</th>`;
+    });
+    html += `</tr></thead><tbody>`;
+
+    stages.forEach(stage => {
+      html += `<tr><td class="stage-cell">${stage}</td>`;
+      for (let i = 0; i < timeSlots.length; ) {
+        const slot = timeSlots[i];
+        const artist = scheduleData[stage][slot];
+        if (!artist) {
+          html += `<td class="empty-slot"></td>`;
+          i++;
+          continue;
+        }
+
+        let span = 1;
+        for (let j = i + 1; j < timeSlots.length; j++) {
+          if (scheduleData[stage][timeSlots[j]] === artist) {
+            span++;
+          } else {
+            break;
+          }
+        }
+
+        const key = `${stage}|${slot}|${artist}`;
+        const hasFav = favorites.has(key);
+        html += `<td class="act-block" colspan="${span}" data-stage="${stage}" data-timeslot="${slot}" data-artist="${artist}">
+                    <div class="act-name">${artist}</div>
+                    <div class="act-genre">${artistsDb[artist]?.genre || (currentLang === 'nl' ? 'Evenement' : 'Event')}</div>
+                    <i class="fa${hasFav ? 's' : 'r'} fa-star favorite-star" data-stage="${stage}" data-timeslot="${slot}" data-artist="${artist}"></i>
+                  </td>`;
+        i += span;
+      }
+      html += `</tr>`;
+    });
+
+    html += `</tbody></table>`;
     container.innerHTML = html;
     document.querySelectorAll(`#${containerId} .favorite-star`).forEach(star => {
       star.addEventListener('click', (e) => {
@@ -1061,7 +1120,7 @@
         toggleFavorite(stage, timeslot, artist);
       });
     });
-    document.querySelectorAll(`#${containerId} .act-cell`).forEach(cell => {
+    document.querySelectorAll(`#${containerId} .act-block`).forEach(cell => {
       cell.addEventListener('click', (e) => {
         if (e.target.classList.contains('favorite-star')) return;
         const stage = cell.getAttribute('data-stage');
@@ -1221,8 +1280,8 @@
   // ----- Taalinstellingen (vereenvoudigd voor deze demo) -----
   let currentLang = 'nl';
   const translations = {
-    nl: { nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart", clear_favs: "Wis favorieten", fav_hint: "Klik op het sterretje om een act te favorieten. Je krijgt notificaties 15,10,5 min van tevoren.", stage_label: "Podium", time_label: "Tijd", genre_label: "Genre", notify_btn: "Notificaties inschakelen", map_hint: "Tik op een icoon voor meer informatie.", map_legend_title: "Legenda", map_message_label: "Laat een bericht achter", map_message_send: "Verstuur", map_message_placeholder: "Typ je bericht…", general_title: "❤️U Festival", general_desc: "Voor (nieuwe) studenten in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Zaterdag 5 september 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download de app", install_desc: "Scan de QR-code om de festival-app op je telefoon te openen en te installeren.", install_btn: "Installeer app", install_ios: "iPhone: Open in Safari → Deel → Zet op beginscherm.", install_android: "Android: Open de link → Installeer app (of ⋮ → Toevoegen aan startscherm).", access_title: "Bereikbaarheid", bike_text: "Gratis stalling, hele dag.", car_text: "P+R Papendorp, ticket online of PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Gratis shuttle vanaf Utrecht Centraal.", lockers_text: "Kluisjes voor 3-4 jassen.", med_q: "Medicatie?", med_a: "Toegestaan met doktersverklaring.", reentry_q: "Terrein verlaten?", reentry_a: "Nee, i.v.m. veiligheid.", glu_desc: "GLU-studenten met gouden armbandje: gouden toiletten en snelle bar.", gps_button: "📍 Lokaliseren", gps_status_searching: "Locatie zoeken…", gps_status_success: "Je locatie is gevonden.", gps_status_denied: "Geolocation geblokkeerd of niet beschikbaar.", gps_status_error: "Kan locatie niet ophalen.", info_general_title: "Algemeen & contact", info_general_desc: "Het ❤️U Festival is voor (nieuwe) studenten in de regio Utrecht en is een aanvulling op UIT.", info_address_label: "Locatie:", info_address_text: "Strijkviertel, Utrecht", info_nav_address_label: "Navigatieadres:", info_nav_address_text: "Strijkviertelweg, Utrecht", info_datetime_label: "Datum & Openingstijden", info_datetime_text: "Zaterdag 5 september 2026 - 12:00 tot 23:00 uur", info_bike_title: "Fiets", info_bike_text: "Er is een grote gratis fietsenstalling aanwezig waar je jouw fiets de gehele dag kunt stallen.", info_car_title: "Auto", info_car_text: "Je kunt een parkingticket aanschaffen. Parkeren kan op P+R Papendorp, volg hiervoor de borden 'P online ticket'. Heb je geen ticket van te voren gekocht? Dan kun je bij de parkeerwachter op locatie een parkeerticket aanschaffen (PIN ONLY). Let wel op: VOL=VOL", info_ov_title: "OV", info_ov_text: "Kom je met het openbaar vervoer naar Lief? Plan dan je trip via 9292.nl.", info_shuttle_title: "Shuttlebus", info_shuttle_text: "Vanaf Utrecht Centraal kun je onze gratis shuttlebus richting het festivalterrein pakken. Je vindt deze bus op het centraal station aan de Mineurslaan. Volg de witte bordjes met zwarte pijlen én ' ❤️U Festival'. De bus rijdt tussen 12:00 uur & 19:00 uur richting het festival en vanaf 21:00 uur kun je weer instappen om richting het station te gaan.", info_taxi_title: "Taxi + Kiss & Ride", info_taxi_text: "Navigeer naar Strijkviertel, De Meern (Utrecht). Volg de borden 'Kiss & Ride ❤️U Festival', zodra je in de buurt bent van het festivalterrein.", lockers_title: "Lockers", info_lockers_text1: "Op het festivalterrein zijn kluisjes aanwezig waar je je spullen veilig kunt opbergen!", info_lockers_text2: "Hier passen 3 à 4 jassen in. Goed om te weten: je kunt je kluisje gedurende de hele dag openen en sluiten zo vaak je wilt.", info_lockers_text3: "Het is niet mogelijk om online een kluisje te reserveren.", faq_title: "FAQ", info_faq_med_q: "Ik gebruik medicatie. Wat nu?", info_faq_med_a: "Het is toegestaan om medicijnen mee te nemen in een dosis die je maximaal nodig hebt op 1 dag. Een doktersverklaring/medicatiepaspoort is noodzakelijk. De beveiliging zal jouw documentatie beoordelen en de medicijnen controleren. Het kan zijn dat de EHBO jouw medicijnen (bijvoorbeeld als deze gevaarlijk zijn i.c.m. alcohol) in bewaring neemt en je deze enkel kan innemen bij de EHBO.", info_faq_reentry_q: "Mag ik het festivalterrein tussentijds verlaten?", info_faq_reentry_a: "Nee, helaas is dat niet mogelijk. Om de veiligheid van alle bezoekers te kunnen waarborgen, kunnen we het niet toestaan dat het festivalterrein tussentijds verlaten wordt. Wij hebben namelijk geen zicht op hetgeen wat een bezoeker buiten het festivalterrein doet en in welke staat deze het terrein weer betreedt. Hier kunnen dan ook geen uitzonderingen voor gemaakt worden. Wij hebben genoeg loungeplekken, foodstands & barren om het een hele dag uit te kunnen houden.", info_faq_lockers_q: "Zijn er lockers?", info_faq_lockers_a: "Yes, deze zijn er! Op het terrein kun je medium & grote lockers huren.", glu_title: "Golden-GLU", info_glu_text1: "Studenten van het GLU hebben tijdens het festival speciale privileges en zijn herkenbaar aan een gouden armbandje.", info_glu_text2: "Met dit gouden armbandje kunnen ze tijdens het festival gebruik maken van de gouden toiletten en met goud gemarkeerde bestelpunten aan de bars zonder in een rij te hoeven staan." },
-    en: { nav_home: "Home", nav_info: "Info", nav_program: "Schedule", nav_map: "Map", clear_favs: "Clear favorites", fav_hint: "Click the star to favorite an act. You'll receive notifications 15,10,5 minutes before.", stage_label: "Stage", time_label: "Time", genre_label: "Genre", notify_btn: "Enable notifications", map_hint: "Tap an icon for more information.", map_legend_title: "Legend", map_message_label: "Leave a message", map_message_send: "Send", map_message_placeholder: "Type your message…", general_title: "❤️U Festival", general_desc: "For (new) students in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Saturday September 5, 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download the app", install_desc: "Scan the QR code to open and install the festival app on your phone.", install_btn: "Install app", install_ios: "iPhone: Open in Safari → Share → Add to Home Screen.", install_android: "Android: Open the link → Install app (or ⋮ → Add to Home screen).", access_title: "Accessibility", bike_text: "Free bicycle parking all day.", car_text: "P+R Papendorp, ticket online or PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Free shuttle from Utrecht Central.", lockers_text: "Lockers for 3-4 coats.", med_q: "Medication?", med_a: "Allowed with doctor's note.", reentry_q: "Leave & re-enter?", reentry_a: "No, for safety.", glu_desc: "GLU students with golden wristband: golden toilets & fast bar.", gps_button: "📍 Locate me", gps_status_searching: "Searching for location…", gps_status_success: "Your location is found.", gps_status_denied: "Geolocation blocked or unavailable.", gps_status_error: "Cannot retrieve location.", info_general_title: "General & contact", info_general_desc: "The ❤️U Festival is for (new) students in the Utrecht region and is a supplement to UIT.", info_address_label: "Location:", info_address_text: "Strijkviertel, Utrecht", info_nav_address_label: "Navigation address:", info_nav_address_text: "Strijkviertelweg, Utrecht", info_datetime_label: "Date & opening times", info_datetime_text: "Saturday September 5, 2026 - 12:00 to 23:00", info_bike_title: "Bike", info_bike_text: "There is a large free bike parking area where you can park your bike all day.", info_car_title: "Car", info_car_text: "You can purchase a parking ticket. Parking is available at P+R Papendorp; follow the signs 'P online ticket'. If you have not bought a ticket in advance, you can purchase one from the parking attendant on site (PIN ONLY). Note: WHEN IT'S FULL, IT'S FULL.", info_ov_title: "Public transport", info_ov_text: "If you are coming by public transport to Lief, plan your trip via 9292.nl.", info_shuttle_title: "Shuttle bus", info_shuttle_text: "From Utrecht Central you can take our free shuttle bus to the festival site. You'll find this bus at the central station on Mineurslaan. Follow the white signs with black arrows and '❤️U Festival'. The bus runs between 12:00 and 19:00 toward the festival and from 21:00 you can board again to return to the station.", info_taxi_title: "Taxi + Kiss & Ride", info_taxi_text: "Navigate to Strijkviertel, De Meern (Utrecht). Follow the signs 'Kiss & Ride ❤️U Festival' once you are near the festival site.", lockers_title: "Lockers", info_lockers_text1: "There are lockers on the festival site where you can safely store your belongings!", info_lockers_text2: "They fit 3 to 4 jackets. Good to know: you can open and close your locker as often as you want throughout the day.", info_lockers_text3: "It is not possible to reserve a locker online.", faq_title: "FAQ", info_faq_med_q: "I use medication. What now?", info_faq_med_a: "It is allowed to bring medication in a dose you need for one day. A doctor's statement/medication passport is required. Security will check your documentation and medication. The first aid team may take your medication into safekeeping (for example if it is dangerous with alcohol) and you may only take it under their supervision.", info_faq_reentry_q: "May I leave the festival grounds temporarily?", info_faq_reentry_a: "No, unfortunately that is not possible. For the safety of all visitors, we cannot allow temporary exit from the festival grounds. We do not know what visitors do outside the festival grounds or in what condition they return. No exceptions can be made. We have plenty of lounges, food stands & bars to spend the whole day.", info_faq_lockers_q: "Are there lockers?", info_faq_lockers_a: "Yes, there are! On site you can rent medium & large lockers.", glu_title: "Golden-GLU", info_glu_text1: "GLU students have special privileges at the festival and are recognizable by a golden wristband.", info_glu_text2: "With this golden wristband they can use golden toilets and gold-marked bar order points without waiting in line." }
+    nl: { nav_home: "Home", nav_info: "Info", nav_program: "Programma", nav_map: "Kaart", schedule_title: "📅 Blokkenschema", schedule_day_saturday: "Zaterdag", schedule_day_sunday: "Zondag", clear_favs: "Wis favorieten", fav_hint: "Klik op het sterretje om een act te favorieten. Je krijgt notificaties 15,10,5 min van tevoren.", stage_label: "Podium", time_label: "Tijd", genre_label: "Genre", notify_btn: "Notificaties inschakelen", map_hint: "Tik op een icoon voor meer informatie.", map_legend_title: "Legenda", map_message_label: "Laat een bericht achter", map_message_send: "Verstuur", map_message_placeholder: "Typ je bericht…", general_title: "❤️U Festival", general_desc: "Voor (nieuwe) studenten in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Zaterdag 5 september 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download de app", install_desc: "Scan de QR-code om de festival-app op je telefoon te openen en te installeren.", install_btn: "Installeer app", install_ios: "iPhone: Open in Safari → Deel → Zet op beginscherm.", install_android: "Android: Open de link → Installeer app (of ⋮ → Toevoegen aan startscherm).", access_title: "Bereikbaarheid", bike_text: "Gratis stalling, hele dag.", car_text: "P+R Papendorp, ticket online of PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Gratis shuttle vanaf Utrecht Centraal.", lockers_text: "Kluisjes voor 3-4 jassen.", med_q: "Medicatie?", med_a: "Toegestaan met doktersverklaring.", reentry_q: "Terrein verlaten?", reentry_a: "Nee, i.v.m. veiligheid.", glu_desc: "GLU-studenten met gouden armbandje: gouden toiletten en snelle bar.", gps_button: "📍 Lokaliseren", gps_status_searching: "Locatie zoeken…", gps_status_success: "Je locatie is gevonden.", gps_status_denied: "Geolocation geblokkeerd of niet beschikbaar.", gps_status_error: "Kan locatie niet ophalen.", info_general_title: "Algemeen & contact", info_general_desc: "Het ❤️U Festival is voor (nieuwe) studenten in de regio Utrecht en is een aanvulling op UIT.", info_address_label: "Locatie:", info_address_text: "Strijkviertel, Utrecht", info_nav_address_label: "Navigatieadres:", info_nav_address_text: "Strijkviertelweg, Utrecht", info_datetime_label: "Datum & Openingstijden", info_datetime_text: "Zaterdag 5 september 2026 - 12:00 tot 23:00 uur", info_bike_title: "Fiets", info_bike_text: "Er is een grote gratis fietsenstalling aanwezig waar je jouw fiets de gehele dag kunt stallen.", info_car_title: "Auto", info_car_text: "Je kunt een parkingticket aanschaffen. Parkeren kan op P+R Papendorp, volg hiervoor de borden 'P online ticket'. Heb je geen ticket van te voren gekocht? Dan kun je bij de parkeerwachter op locatie een parkeerticket aanschaffen (PIN ONLY). Let wel op: VOL=VOL", info_ov_title: "OV", info_ov_text: "Kom je met het openbaar vervoer naar Lief? Plan dan je trip via 9292.nl.", info_shuttle_title: "Shuttlebus", info_shuttle_text: "Vanaf Utrecht Centraal kun je onze gratis shuttlebus richting het festivalterrein pakken. Je vindt deze bus op het centraal station aan de Mineurslaan. Volg de witte bordjes met zwarte pijlen én ' ❤️U Festival'. De bus rijdt tussen 12:00 uur & 19:00 uur richting het festival en vanaf 21:00 uur kun je weer instappen om richting het station te gaan.", info_taxi_title: "Taxi + Kiss & Ride", info_taxi_text: "Navigeer naar Strijkviertel, De Meern (Utrecht). Volg de borden 'Kiss & Ride ❤️U Festival', zodra je in de buurt bent van het festivalterrein.", lockers_title: "Lockers", info_lockers_text1: "Op het festivalterrein zijn kluisjes aanwezig waar je je spullen veilig kunt opbergen!", info_lockers_text2: "Hier passen 3 à 4 jassen in. Goed om te weten: je kunt je kluisje gedurende de hele dag openen en sluiten zo vaak je wilt.", info_lockers_text3: "Het is niet mogelijk om online een kluisje te reserveren.", faq_title: "FAQ", info_faq_med_q: "Ik gebruik medicatie. Wat nu?", info_faq_med_a: "Het is toegestaan om medicijnen mee te nemen in een dosis die je maximaal nodig hebt op 1 dag. Een doktersverklaring/medicatiepaspoort is noodzakelijk. De beveiliging zal jouw documentatie beoordelen en de medicijnen controleren. Het kan zijn dat de EHBO jouw medicijnen (bijvoorbeeld als deze gevaarlijk zijn i.c.m. alcohol) in bewaring neemt en je deze enkel kan innemen bij de EHBO.", info_faq_reentry_q: "Mag ik het festivalterrein tussentijds verlaten?", info_faq_reentry_a: "Nee, helaas is dat niet mogelijk. Om de veiligheid van alle bezoekers te kunnen waarborgen, kunnen we het niet toestaan dat het festivalterrein tussentijds verlaten wordt. Wij hebben namelijk geen zicht op hetgeen wat een bezoeker buiten het festivalterrein doet en in welke staat deze het terrein weer betreedt. Hier kunnen dan ook geen uitzonderingen voor gemaakt worden. Wij hebben genoeg loungeplekken, foodstands & barren om het een hele dag uit te kunnen houden.", info_faq_lockers_q: "Zijn er lockers?", info_faq_lockers_a: "Yes, deze zijn er! Op het terrein kun je medium & grote lockers huren.", glu_title: "Golden-GLU", info_glu_text1: "Studenten van het GLU hebben tijdens het festival speciale privileges en zijn herkenbaar aan een gouden armbandje.", info_glu_text2: "Met dit gouden armbandje kunnen ze tijdens het festival gebruik maken van de gouden toiletten en met goud gemarkeerde bestelpunten aan de bars zonder in een rij te hoeven staan." },
+    en: { nav_home: "Home", nav_info: "Info", nav_program: "Schedule", nav_map: "Map", schedule_title: "📅 Schedule", schedule_day_saturday: "Saturday", schedule_day_sunday: "Sunday", clear_favs: "Clear favorites", fav_hint: "Click the star to favorite an act. You'll receive notifications 15,10,5 minutes before.", stage_label: "Stage", time_label: "Time", genre_label: "Genre", notify_btn: "Enable notifications", map_hint: "Tap an icon for more information.", map_legend_title: "Legend", map_message_label: "Leave a message", map_message_send: "Send", map_message_placeholder: "Type your message…", general_title: "❤️U Festival", general_desc: "For (new) students in Utrecht.", address_label: "Strijkviertel, Utrecht", datetime: "Saturday September 5, 2026, 12:00 - 23:00", contact_title: "Contact", install_title: "📲 Download the app", install_desc: "Scan the QR code to open and install the festival app on your phone.", install_btn: "Install app", install_ios: "iPhone: Open in Safari → Share → Add to Home Screen.", install_android: "Android: Open the link → Install app (or ⋮ → Add to Home screen).", access_title: "Accessibility", bike_text: "Free bicycle parking all day.", car_text: "P+R Papendorp, ticket online or PIN.", ov_text: "Plan via 9292.nl.", shuttle_text: "Free shuttle from Utrecht Central.", lockers_text: "Lockers for 3-4 coats.", med_q: "Medication?", med_a: "Allowed with doctor's note.", reentry_q: "Leave & re-enter?", reentry_a: "No, for safety.", glu_desc: "GLU students with golden wristband: golden toilets & fast bar.", gps_button: "📍 Locate me", gps_status_searching: "Searching for location…", gps_status_success: "Your location is found.", gps_status_denied: "Geolocation blocked or unavailable.", gps_status_error: "Cannot retrieve location.", info_general_title: "General & contact", info_general_desc: "The ❤️U Festival is for (new) students in the Utrecht region and is a supplement to UIT.", info_address_label: "Location:", info_address_text: "Strijkviertel, Utrecht", info_nav_address_label: "Navigation address:", info_nav_address_text: "Strijkviertelweg, Utrecht", info_datetime_label: "Date & opening times", info_datetime_text: "Saturday September 5, 2026 - 12:00 to 23:00", info_bike_title: "Bike", info_bike_text: "There is a large free bike parking area where you can park your bike all day.", info_car_title: "Car", info_car_text: "You can purchase a parking ticket. Parking is available at P+R Papendorp; follow the signs 'P online ticket'. If you have not bought a ticket in advance, you can purchase one from the parking attendant on site (PIN ONLY). Note: WHEN IT'S FULL, IT'S FULL.", info_ov_title: "Public transport", info_ov_text: "If you are coming by public transport to Lief, plan your trip via 9292.nl.", info_shuttle_title: "Shuttle bus", info_shuttle_text: "From Utrecht Central you can take our free shuttle bus to the festival site. You'll find this bus at the central station on Mineurslaan. Follow the white signs with black arrows and '❤️U Festival'. The bus runs between 12:00 and 19:00 toward the festival and from 21:00 you can board again to return to the station.", info_taxi_title: "Taxi + Kiss & Ride", info_taxi_text: "Navigate to Strijkviertel, De Meern (Utrecht). Follow the signs 'Kiss & Ride ❤️U Festival' once you are near the festival site.", lockers_title: "Lockers", info_lockers_text1: "There are lockers on the festival site where you can safely store your belongings!", info_lockers_text2: "They fit 3 to 4 jackets. Good to know: you can open and close your locker as often as you want throughout the day.", info_lockers_text3: "It is not possible to reserve a locker online.", faq_title: "FAQ", info_faq_med_q: "I use medication. What now?", info_faq_med_a: "It is allowed to bring medication in a dose you need for one day. A doctor's statement/medication passport is required. Security will check your documentation and medication. The first aid team may take your medication into safekeeping (for example if it is dangerous with alcohol) and you may only take it under their supervision.", info_faq_reentry_q: "May I leave the festival grounds temporarily?", info_faq_reentry_a: "No, unfortunately that is not possible. For the safety of all visitors, we cannot allow temporary exit from the festival grounds. We do not know what visitors do outside the festival grounds or in what condition they return. No exceptions can be made. We have plenty of lounges, food stands & bars to spend the whole day.", info_faq_lockers_q: "Are there lockers?", info_faq_lockers_a: "Yes, there are! On site you can rent medium & large lockers.", glu_title: "Golden-GLU", info_glu_text1: "GLU students have special privileges at the festival and are recognizable by a golden wristband.", info_glu_text2: "With this golden wristband they can use golden toilets and gold-marked bar order points without waiting in line." }
   };
   function applyLanguage() {
     const t = translations[currentLang];
@@ -1546,7 +1605,7 @@
     });
   }
 
-  function getStageScheduleInfo(stageName) {
+  function getStageScheduleInfo(stageName, schedule) {
     const now = new Date();
     const hour = now.getHours();
     const minute = now.getMinutes();
@@ -1558,7 +1617,7 @@
     let nextSlot = null;
 
     timeSlots.forEach((slot) => {
-      const artist = scheduleData[stageName]?.[slot];
+      const artist = schedule[stageName]?.[slot];
       if (!artist) return;
       const [startStr, endStr] = slot.split(" - ");
       const [sh, sm] = startStr.split(":").map(Number);
@@ -1589,7 +1648,8 @@
 
     const liveEl = document.getElementById("mapPopupLive");
     if (marker.stage) {
-      const info = getStageScheduleInfo(marker.stage);
+      const schedule = getActiveFestivalSchedule();
+      const info = getStageScheduleInfo(marker.stage, schedule);
       let html = "";
       if (info.currentAct) {
         html += `<strong>${currentLang === "nl" ? "Nu:" : "Now:"}</strong> ${info.currentAct} (${info.currentSlot})<br>`;
